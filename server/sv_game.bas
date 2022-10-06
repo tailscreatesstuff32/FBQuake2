@@ -27,5 +27,3 @@ sub SV_InitGameProgs()
 End Sub
 
 
-
-
