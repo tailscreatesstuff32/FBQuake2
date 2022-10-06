@@ -10,8 +10,8 @@ dim shared as qboolean	mouseactive 	'// _false when not focus app
 dim shared as  qboolean	restore_spi 
 dim shared as  qboolean	mouseinitialized 
 
-
-
+dim shared as Cvar_t ptr in_mouse
+dim shared as Cvar_t ptr in_joystick
 
 sub IN_StartupJoystick ()
 	
@@ -25,10 +25,10 @@ End Sub
 sub IN_init
 	'	// mouse variables
 	'm_filter				= Cvar_Get ("m_filter",					"0",		0);
-   ' in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE);
+  in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE) 
 
 	'// joystick variables
-	'in_joystick				= Cvar_Get ("in_joystick",				"0",		CVAR_ARCHIVE);
+	 in_joystick				= Cvar_Get ("in_joystick",				"0",		CVAR_ARCHIVE) 
 	'joy_name				= Cvar_Get ("joy_name",					"joystick",	0);
 	'joy_advanced			= Cvar_Get ("joy_advanced",				"0",		0);
 	'joy_advaxisx			= Cvar_Get ("joy_advaxisx",				"0",		0);
