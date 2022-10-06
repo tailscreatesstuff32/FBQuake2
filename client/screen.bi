@@ -1,0 +1,1 @@
+declare sub SCR_Init ()
