@@ -555,10 +555,10 @@ sub VID_CheckChanges()
 		if ( VID_LoadRefresh( _name ) = NULL) then
 	 
 		 
-			if ( strcmp (vid_ref->_string, "FBRef_Soft") =  0 ) then
+			if ( strcmp (vid_ref->_string, "Soft") =  0 ) then
 				Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!") 
 			end if
-			Cvar_Set( "vid_ref", "FBRef_Soft" ) 
+			Cvar_Set( "vid_ref", "Soft" ) 
 
 			'/*
 			'** drop the console if we fail to load a refresh
