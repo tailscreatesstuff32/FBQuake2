@@ -419,7 +419,7 @@ declare sub Key_Init ()
  
      'cvar_setvalue("sw_mode", 3 )
      
-     cvar_setvalue("vid_fullscreen", 0 )
+     'cvar_setvalue("vid_fullscreen", 0 )
  
 '
 '	//
