@@ -196,6 +196,9 @@ end function
  
  
  
+ R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ) )
+ 
+ 
  	sww_state.initializing = true
 
  		return retval
@@ -266,13 +269,12 @@ sub SWimp_SetPalette(_palette as const ubyte ptr  )
 		_palette = cast(const ubyte ptr, @sw_state.currentpalette(0) )
 	end if
 
-	if ( sw_state.fullscreen =false) then
+	if ( sw_state.fullscreen = false) then
 	 
-		DIB_SetPalette( cast(const ubyte ptr,_palette)) 
-	 
+	 DDRAW_SetPalette(cast(const ubyte ptr,_palette) ) 
 	else
-	 
-		DDRAW_SetPalette(cast(const ubyte ptr,_palette) ) 
+	 DIB_SetPalette( cast(const ubyte ptr,_palette)) 
+		' DDRAW_SetPalette(cast(const ubyte ptr,_palette) ) 
 	end if
 end sub
 
