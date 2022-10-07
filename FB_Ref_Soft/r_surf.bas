@@ -45,6 +45,8 @@ sub R_InitCaches ()
 	sc_base->_next = NULL 
 	sc_base->owner = NULL 
 	sc_base->size = sc_size 
+	
+ 
 end sub
 
 

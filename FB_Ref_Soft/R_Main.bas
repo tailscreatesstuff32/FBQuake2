@@ -429,7 +429,6 @@ SWimp_Init( hInstance, wndProc )
 R_BeginFrame( 0 )
 '''''''''''''''''''''''''''''''''''''''''''''''''
 
-
 ri.Con_Printf (PRINT_ALL, !"ref_soft version: " REF_VERSION !"\n")
 
 return _true
@@ -517,7 +516,7 @@ sub R_GammaCorrectAndSetPalette( _palette as const ubyte ptr)
 	Next
 
 
-	SWimp_SetPalette( @sw_state.currentpalette(0) )
+	 SWimp_SetPalette( @sw_state.currentpalette(0) )
 
 End Sub
 
@@ -549,13 +548,12 @@ if ( sc_base ) then
 EndIf
 
 
- 'd_pzbuffer = malloc(vid._width*vid._height*2)
+ d_pzbuffer = malloc(vid._width*vid._height*2)
 
 R_InitCaches ()
 
-R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ) )
-
-
+ R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ) )
+ 'print "PASSED!!!!!!!!!!!"
 End Sub
 
 
@@ -594,8 +592,7 @@ dim as rserr_t _err
 '	** fullscreen mode, e.g. 320x200 on a system that doesn't support that res
 '	*/
 
-
-_err = SWimp_SetMode(@vid._width,@vid._height,sw_mode->value,_false)
+_err = SWimp_SetMode(@vid._width,@vid._height,sw_mode->value,vid_fullscreen->value)
 
 'print vid._width
 'print vid._height

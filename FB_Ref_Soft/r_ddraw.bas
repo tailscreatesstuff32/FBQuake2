@@ -222,7 +222,8 @@ sub DDRAW_SetPalette( _pal as  const ubyte ptr  )
 	dim as PALETTEENTRY palentries(256)
 	dim as integer i 
 
-	if ( sww_state.lpddpPalette) then
+	if ( sww_state.lpddpPalette = NULL) then
+		'print " HERENOW!!!!!!!!!!!!!!"
 		return
 	EndIf
  

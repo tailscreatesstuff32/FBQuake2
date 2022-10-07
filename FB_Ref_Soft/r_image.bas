@@ -308,6 +308,298 @@ function GL_LoadPic ( _name as zstring ptr, pic as ubyte ptr,_width as integer ,
 End Function
 
 
+  
+ type _TargaHeader  
+ 	
+   as ubyte 	id_length, colormap_type, image_type 
+ 	as ushort	colormap_index, colormap_length 
+ 	as ubyte	colormap_size 
+   as ushort	x_origin, y_origin, _width, _height 
+ 	as ubyte	pixel_size, attributes 
+ 
+ 	
+ End Type: type TargaHeader as _TargaHeader
+
+'WORKING SO FAR
+
+'/*
+'=============
+'LoadTGA
+'=============
+'*/
+sub LoadTGA (_name as zstring ptr, _pic as ubyte ptr ptr,_width as  integer ptr ,  _height as  integer ptr)
+ 
+	dim as integer		columns, rows, numPixels 
+	dim as ubyte ptr pixbuf 
+	dim as integer		row, column 
+	dim as ubyte ptr buf_p 
+	dim as ubyte ptr buffer 
+	dim as integer		length 
+	dim as TargaHeader targa_header 
+	dim as ubyte ptr targa_rgba 
+	dim as ubyte tmp(2) 
+
+	*_pic = NULL 
+
+	'//
+	'// load the file
+	'//
+	length = ri.FS_LoadFile (_name,  cast(any ptr  ptr, @buffer)) 
+	if (buffer = NULL) then
+		'ri.Con_Printf (PRINT_DEVELOPER, "Bad tga file %s\n", name);
+		printf(!"Bad tga file %s\n", _name)
+		return 
+ 
+		
+	EndIf
+	 
+
+
+	buf_p = buffer 
+
+	targa_header.id_length = *buf_p:buf_p+=1 
+	targa_header.colormap_type = *buf_p:buf_p+=1
+	targa_header.image_type = *buf_p:buf_p+=1 
+	
+	tmp(0) = buf_p[0] 
+	tmp(1) = buf_p[1] 
+	 targa_header.colormap_index = LittleShort ( *(cast (short ptr,@tmp(0))) ) 
+	 buf_p+=2 
+	tmp(0) = buf_p[0] 
+	tmp(1) = buf_p[1] 
+	 targa_header.colormap_length = LittleShort ( *(cast (short ptr,@tmp(0))) ) 
+	 buf_p+=2 
+	 targa_header.colormap_size = *buf_p:buf_p+=1
+	 targa_header.x_origin = LittleShort ( *(cast (short ptr,buf_p)) )
+	  buf_p+=2 
+	 targa_header.y_origin = LittleShort ( *(cast (short ptr,buf_p)) )
+	 buf_p+=2 
+	 targa_header._width = LittleShort ( *(cast (short ptr,buf_p)) )
+	 buf_p+=2 
+	 targa_header._height = LittleShort ( *(cast (short ptr,buf_p)) )
+	 buf_p+=2 
+	 targa_header.pixel_size = *buf_p:buf_p+=1 
+	 targa_header.attributes = *buf_p:buf_p+=1 
+	 
+
+	 if (targa_header.image_type <> 2 and targa_header.image_type <> 10) then 
+	 	
+	'	ri.Sys_Error (ERR_DROP, "LoadTGA: Only type 2 and 10 targa RGB images supported\n");
+	printf( !"LoadTGA: Only type 2 and 10 targa RGB images supported\n")
+	return
+    end if
+   
+
+	 if (targa_header.colormap_type <> 0 _
+	 	or (targa_header.pixel_size <> 32 and targa_header.pixel_size<>24)) then
+	 	'	ri.Sys_Error (ERR_DROP, "LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
+	 	printf( !"LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n")
+	 	return
+	 end if
+	
+	
+	
+ 
+
+
+	 columns = targa_header._width 
+	 rows = targa_header._height 
+	 numPixels = columns * rows 
+
+    'print numPixels 
+ 
+	 if (_width) then
+	 	*_width = columns
+	 end if 
+	 if (_height) then
+	 	*_height = rows 
+	 EndIf
+	 
+	  
+
+	 targa_rgba = malloc (numPixels*4) 
+	 *_pic = targa_rgba 
+   
+	 if (targa_header.id_length <> 0) then
+	 	buf_p += targa_header.id_length '  // skip TARGA image comment
+	 	beep
+	 EndIf
+	  
+	
+	 if (targa_header.image_type=2)  then  '// Uncompressed, RGB images
+	' print "uncompressed"
+	    dim as  ubyte red,green,blue,alphabyte    
+
+    
+    
+ 'WORKS FINE'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''   
+       row = rows-1
+ 
+    do while row >=0 ':
+    
+ 
+     
+    	pixbuf = targa_rgba+ row*columns*4
+    	 column = 0
+    	 do while column < columns
+        
+    
+    select case (targa_header.pixel_size)
+    	
+    	case 24
+    	 				   blue = *buf_p: buf_p+=1 
+	 						green = *buf_p: buf_p+=1
+	 						red = *buf_p: buf_p+=1
+	 				      *pixbuf  = red: pixbuf+=1 
+	 						*pixbuf  = green : pixbuf+=1 
+	 						*pixbuf  = blue: pixbuf+=1  
+	 						*pixbuf  = 255: pixbuf+=1 
+    	
+    	case 32
+    		
+		                blue = *buf_p: buf_p+=1 
+	 						 green = *buf_p: buf_p+=1
+	 						 red = *buf_p: buf_p+=1
+	 						 alphabyte  = *buf_p: buf_p+=1
+	 				       *pixbuf  = red: pixbuf+=1 
+	 						 *pixbuf  = green : pixbuf+=1 
+	 						 *pixbuf  = blue: pixbuf+=1  
+	 						 *pixbuf  = alphabyte: pixbuf+=1 
+
+    End Select
+    
+    
+    
+     column+=1
+    	 loop
+    	 row-=1
+    
+   loop
+ ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+  'WORKS FINE'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''    
+	 elseif (targa_header.image_type=10)  then
+	  'print "RLE compressed"
+ 
+   
+	  	 dim as ubyte red,green,blue,alphabyte,packetHeader,packetSize,j
+	  row = rows-1
+    do while row >=0
+	 pixbuf = targa_rgba+ row*columns*4
+	 
+     	 column = 0
+   	 do while column < columns
+   	 
+    	 	packetHeader= *buf_p:buf_p+=1
+     	 	packetSize = 1 + (packetHeader and &H7f)
+     	 	
+   
+     
+   	 if (packetHeader and &H80) then   '// run-length packet
+   	 	
+   	 	
+    
+         	select case (targa_header.pixel_size)  
+    	 					case 24 
+								blue = *buf_p:buf_p+=1
+								green = *buf_p:buf_p+=1
+								red = *buf_p:buf_p+=1
+								alphabyte = 255 
+							 
+						case 32 
+			               blue = *buf_p:buf_p+=1
+								green = *buf_p:buf_p+=1
+								red = *buf_p:buf_p+=1
+								alphabyte = *buf_p:buf_p+=1
+ 	 		
+         	End Select
+         	
+ 
+	 		  for j = 0 to packetSize -1
+
+	 					*pixbuf=red:pixbuf+=1 
+	 					*pixbuf=green :pixbuf+=1
+	 					*pixbuf=blue :pixbuf+=1
+	 					*pixbuf=alphabyte :pixbuf+=1
+	 					column+=1
+	 					if (column= columns) then ' // run spans across rows
+	 						column=0
+	 				
+	 						if (row>0) then
+	 							row-=1
+	 							
+	 						else
+	 							goto breakOut 
+	 						
+	 						end if
+	 						pixbuf = targa_rgba + row*columns*4 
+	 				end if	
+	 						
+	 						
+	 		  next
+  		
+    	 	else	                                          '// non run-length packet
+     	 	  	 	 
+ 
+     	 	
+     	 		for j = 0 to packetSize -1
+	 			 select case (targa_header.pixel_size) 
+	 				
+						
+							case 24 
+	  	 				   blue = *buf_p: buf_p+=1 
+	 						green = *buf_p: buf_p+=1
+	 						red = *buf_p: buf_p+=1
+	 				      *pixbuf  = red: pixbuf+=1 
+	 						*pixbuf  = green : pixbuf+=1 
+	 						*pixbuf  = blue: pixbuf+=1  
+	 						*pixbuf  = 255: pixbuf+=1 
+								 
+							case 32 
+							 blue = *buf_p: buf_p+=1 
+	 						 green = *buf_p: buf_p+=1
+	 						 red = *buf_p: buf_p+=1
+	 						 alphabyte  = *buf_p: buf_p+=1
+	 				       *pixbuf  = red: pixbuf+=1 
+	 						 *pixbuf  = green : pixbuf+=1 
+	 						 *pixbuf  = blue: pixbuf+=1  
+	 						 *pixbuf  = alphabyte: pixbuf+=1 
+									 
+	 					End Select
+    		 		
+	 				column+=1
+            if (column=columns) then   '// pixel packet run spans across rows
+	 						column=0 
+ 					if (row>0) then
+	 							row-=1
+ 					   else
+	 							goto breakOut 
+ 						end if		
+	 					pixbuf = targa_rgba + row*columns*4 
+	 									
+	  			end if 
+	
+	
+	    
+     	 		next
+     end if 
+     
+ 
+       loop
+       
+      
+	 breakOut: 	
+	   row-=1
+ 
+       
+	 	loop 
+	  
+end if	 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''      
+	
+
+	ri.FS_FreeFile (buffer) 
+ end sub
+
 '/*
 '=================================================================
 '
@@ -322,10 +614,6 @@ End Function
 'LoadPCX
 '==============
 '*/
-
-'WORKING SO FAR
-
-
 sub	LoadPCX (filename as ZString ptr, _pic as ubyte ptr ptr, _palette as ubyte ptr ptr ,_width as integer ptr, _height as integer ptr)
 
 dim raw as ubyte ptr
