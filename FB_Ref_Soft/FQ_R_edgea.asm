@@ -6,11 +6,13 @@
 Ltemp: .long 0	
 // 1.0/(float)0x100000
 //0x035800000 
-float_1_div_0100000h: .long  1
+float_1_div_0100000h: .long  0x035800000
 	//0.999
-float_point_999: .long 	1
+  //.long   1
+float_point_999: .float 0.999
 //1.001
-float_1_point_001: .long 	1
+//.long   1
+float_1_point_001: .float 1.001
 
 
 .balign 4
