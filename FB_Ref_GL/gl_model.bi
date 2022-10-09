@@ -53,7 +53,7 @@ type glpoly_s
 	verts(4,VERTEXSIZE) 	as float
  end type: type glpoly_t as glpoly_s
 '
- type  msurface_s
+ type  msurface_s_
  
  isframe as integer 
 	 plane  as cplane_t ptr	

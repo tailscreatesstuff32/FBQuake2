@@ -175,7 +175,7 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	dim i as integer 
 	
 	if (_name[0] = NULL) then
- 		'ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
+ 		 ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
 	end if
 	
 	
@@ -184,7 +184,7 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	'//
 	if (_name[0]  = "*") then
 			if (i < 1 or r_worldmodel = NULL or i >= r_worldmodel->numsubmodels) then
-			'		ri.Sys_Error (ERR_DROP, "bad inline model number");
+			  		ri.Sys_Error (ERR_DROP, "bad inline model number") 
 			EndIf
 	
 		i = atoi(_name+1)
@@ -220,7 +220,7 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	if (i  = mod_numknown) then
 		if (mod_numknown = MAX_MOD_KNOWN) then
 			
-			'ri.Sys_Error (ERR_DROP, "mod_numknown == MAX_MOD_KNOWN")
+			 ri.Sys_Error (ERR_DROP, "mod_numknown == MAX_MOD_KNOWN")
 		
 		EndIf
 	mod_numknown+=1
@@ -232,15 +232,13 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	strcpy (_mod->_name, _name) 
 	
 	
-	
-	
-	
+ 
 	modfilelen = ri.FS_LoadFile (_mod->_name, @buf) 
    	if ( buf = NULL) then
- 
+     
 		if (crash) then
 			
-			'ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", mod->name);
+			 ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", mod->name) 
 			printf(!"Mod_NumForName: %s not found", _mod->_name)
 		EndIf		
 		memset (@_mod->_name, 0, sizeof(_mod->_name)) 
@@ -285,8 +283,8 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	 
 
 	case IDSPRITEHEADER 
-	 	'loadmodel->extradata = _Hunk_Begin (&H10000) 
-		'Mod_LoadSpriteModel (_mod, buf) 
+	   loadmodel->extradata = _Hunk_Begin (&H10000) 
+		 Mod_LoadSpriteModel (_mod, buf) 
     print
     printf(!"\n")
    printf("IDS2")

@@ -72,15 +72,15 @@ extern vid as viddef_t
 ' print it_sky
  
  'temporary fix
- type msurface_s_ as msurface_s
+ type msurface_s as msurface_s_
  
- type image_s
+ type image_s_
 	 _name as zstring * MAX_QPATH 
 	_type as imagetype_t
 	as integer _width, _height 
 	as integer upload_width, upload_height 
    registration_sequence as integer ptr		
- 	texturechain as msurface_s_ ptr
+ 	texturechain as msurface_s ptr
    texnum  as Integer
 	as float	_sl, _tl, _sh, _th 
 	scrap as qboolean	 
@@ -91,7 +91,7 @@ extern vid as viddef_t
 	pal_d as UByte ptr
 	
 	
-end Type:  type image_t as  image_s
+ end Type:  type image_t as  image_s 
  
  
  
