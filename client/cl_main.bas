@@ -172,9 +172,7 @@ sub CL_Download_f
 	
 End Sub
 
-
-
-
+ 
 '/*
 '=================
 'CL_InitLocal
@@ -519,8 +517,8 @@ sub  CL_Shutdown()
 
 	CL_WriteConfiguration ()
 
-	'	CDAudio_Shutdown ();
-	'	S_Shutdown();
+	CDAudio_Shutdown () 
+	'S_Shutdown();
 	IN_Shutdown () 'FINISHED
 	VID_Shutdown()
 

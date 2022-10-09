@@ -23,9 +23,14 @@ dim shared as cvar_t	ptr scr_drawall
 declare sub SCR_TimeRefresh_f ()
 declare sub SCR_Loading_f ()
 
+
+
+
+ 
 sub SCR_EndLoadingPlaque ()
-  '_cls.disable_screen = 0 
-	'Con_ClearNotify () 
+  _cls.disable_screen = 0 
+	 Con_ClearNotify () 
+ 
 	
 End Sub
  

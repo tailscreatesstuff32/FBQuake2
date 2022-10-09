@@ -18,9 +18,29 @@ sub Con_CheckResize()
 	
 End Sub
 
-
+sub  Con_ClearNotify () 
+	
+   dim i as integer
+	
+	for  i=0 to NUM_CON_TIMES - 1 
+	con.times(i) = 0 
+	Next
+		
+	
+End Sub
+ 
+ 
+ 
+ 
 sub Con_Clear_f
 	
+	
+	
+	memset (@con.text, asc(" "), CON_TEXTSIZE)
+	
+	
+	
+
 End Sub
 
 sub Con_ToggleConsole_f

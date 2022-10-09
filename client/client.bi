@@ -58,7 +58,7 @@ extern as cvar_t	ptr cl_timedemo
 
 extern as cvar_t	ptr cl_vwep
 
-
+extern as refexport_t	re 		'// interface to refresh .dll
 
  enum  connstate_t
  
@@ -73,6 +73,7 @@ extern as cvar_t	ptr cl_vwep
 
 
 
+
 type client_static_t
 	
 	
@@ -81,6 +82,12 @@ type client_static_t
 	
 	
 End Type
+
+extern as	client_static_t	_cls
+
+
+
+
 
 declare sub V_Init ()
 

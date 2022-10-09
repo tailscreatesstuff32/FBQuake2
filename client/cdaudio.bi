@@ -18,8 +18,8 @@
 '
 '*/
 
-declare function		CDAudio_Init() as Integer
-'void	CDAudio_Shutdown(void) 
+declare function CDAudio_Init() as Integer
+declare sub	CDAudio_Shutdown() 
 'void	CDAudio_Play(int track, qboolean looping);
 'void	CDAudio_Stop(void);
 'void	CDAudio_Update(void);

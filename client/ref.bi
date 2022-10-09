@@ -6,9 +6,9 @@
 #define __REF_H
 
 'temporary fixes
- type image_s_ as image_s
- type model_s_ as model_s	
- type surfcache_s_  as surfcache_s	 
+ type image_s  as image_s_
+ type model_s  as model_s_	
+ type surfcache_s   as surfcache_s_	 
  
 
 
@@ -54,7 +54,7 @@
 
 type entity_s
  
-' 	model as model_s ptr 		
+  	model as model_s  ptr 		
 	angles(3) as float
 	origin(3) as float
 	frame as Integer
@@ -64,10 +64,10 @@ type entity_s
 	skinnum as Integer
 	lightstyle as Integer
 	alpha_ as float	
-'	skin as image_s ptr
+ 	skin as image_s  ptr
 	flag as integer
 
-end type: type entity_t as entity_s
+end type: type entity_t as entity_s 
 
 
 type dlight_t
@@ -127,9 +127,9 @@ type refexport_t
 	Init as function(hInstance as any ptr, wndproc as any ptr) as qboolean 
 
 	BeginRegistration as sub(_map as zstring ptr) 
-    RegisterModel as function(_name as zstring ptr) as model_s_ ptr 
- 	 RegisterSkin as  function(_name as ZString ptr) as image_s_ ptr
-	 RegisterPic as  function( _name as ZString ptr) as image_s_ ptr
+    RegisterModel as function(_name as zstring ptr) as model_s  ptr 
+ 	 RegisterSkin as  function(_name as ZString ptr) as image_s  ptr
+	 RegisterPic as  function( _name as ZString ptr) as image_s  ptr
 	SetSky as sub(_name as ZString, _rotate as float ,  axis as vec3_t) 
 	EndRegistration as sub()
 
