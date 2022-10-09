@@ -72,11 +72,13 @@ function CDAudio_GetAudioDiskInfo() as integer static
     dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM or MCI_WAIT, cast(DWORD,cast(LPVOID,@mciStatusParms))) 
 	if (dwReturn) then
 		Com_DPrintf(!"CDAudio: drive ready test - get status failed\n")
+		Com_Printf (!"CDAudio: drive ready test - get status failed\n")
 		return -1
 	EndIf
  
 	if ( mciStatusParms.dwReturn = NULL) then
 		Com_DPrintf(!"CDAudio: drive not ready\n")
+		Com_Printf(!"CDAudio: drive not ready\n")
 		return -1
 	EndIf
  
@@ -85,6 +87,7 @@ function CDAudio_GetAudioDiskInfo() as integer static
     dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM or MCI_WAIT, cast(DWORD,cast(LPVOID,@mciStatusParms)) )
 	if (dwReturn) then
 			Com_DPrintf(!"CDAudio: get tracks - status failed\n") 
+			Com_Printf (!"CDAudio: get tracks - status failed\n")
 		return -1 
 	EndIf
  
@@ -92,6 +95,7 @@ function CDAudio_GetAudioDiskInfo() as integer static
 	if (mciStatusParms.dwReturn < 1) then
 	 
 		Com_DPrintf(!"CDAudio: no music tracks\n") 
+		Com_DPrintf("CDAudio: no music tracks\n") 
 		return -1 
 	end if
 
@@ -480,7 +484,7 @@ sub CD_f () static
  				n+=1
  			Loop
  
-'
+ 
  	EndIf
  	
 
@@ -499,12 +503,12 @@ sub CD_f () static
  	EndIf
  
  	if (Q_strcasecmp(command, "play")  = 0) then
- 		'CDAudio_Play(atoi(Cmd_Argv (2)), _false)
+ 		 CDAudio_Play(atoi(Cmd_Argv (2)), _false)
  		return
  	EndIf
  
  	if (Q_strcasecmp(_command, "loop") = 0) then
- 		'CDAudio_Play(atoi(Cmd_Argv (2)) , _true)
+ 		 CDAudio_Play(atoi(Cmd_Argv (2)) , _true)
  		return
  	EndIf
  
@@ -581,12 +585,12 @@ function CDAudio_Init() as Integer
 	EndIf
  
 	wDeviceID = mciOpenParms.wDeviceID 
-
+ 
     ''// Set the time format to track/minute/second/frame (TMSF).
     mciSetParms.dwTimeFormat = MCI_FORMAT_TMSF 
     if (dwReturn) then
   
-	'	Com_Printf("MCI_SET_TIME_FORMAT failed (%i)\n", dwReturn);
+	 	Com_Printf(!"MCI_SET_TIME_FORMAT failed (%i)\n", dwReturn) 
          mciSendCommand(wDeviceID, MCI_CLOSE, 0, cast(DWORD,NULL)) 
 		 return -1 
      end if
@@ -601,7 +605,7 @@ function CDAudio_Init() as Integer
 	enabled = _true 
 
 	 if (CDAudio_GetAudioDiskInfo()) then
-		
+ 
    	 Com_Printf(!"CDAudio_Init: No CD in player.\n") 
 		cdValid = _false 
 		enabled = _false 
@@ -637,4 +641,14 @@ sub CDAudio_Activate (active as qboolean )
 	end if
 End Sub
  
+sub CDAudio_Shutdown()
+	 if (initialized = NULL) then
+	 	return 
+	 	CDAudio_Stop() 
+	 EndIf
+	if (mciSendCommand(wDeviceID, MCI_CLOSE, MCI_WAIT, cast(DWORD,NULL))) then
+		Com_DPrintf(!"CDAudio_Shutdown: MCI_CLOSE failed\n")
+	EndIf
+		
+End Sub
  
