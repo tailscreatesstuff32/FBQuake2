@@ -2,11 +2,11 @@
 #Include "FB_Ref_Soft\r_local.bi"
 
 extern draw_chars as image_t ptr	
-
-
+ 
 dim shared draw_chars as image_t ptr		
 dim shared draw_con as image_t ptr	
 
+dim shared draw_colormap as image_t ptr	
 
 'extern	scrap_dirty  as qboolean	
 declare sub Scrap_Upload () 
@@ -59,7 +59,7 @@ function Draw_FindPic (_name as ZString ptr) as image_t	ptr
 	 	 _image = R_FindImage (fullname, it_pic) 
 	 
 	else
-		beep
+	 
 	 	_image = R_FindImage (_name+1, it_pic) 
 	end if
 
@@ -68,8 +68,12 @@ end function
 
 sub Draw_InitLocal ()
 	 
-	  draw_chars = Draw_FindPic ("conchars") 
-	
+	  draw_chars = Draw_FindPic ("conchars")
+	  
+ 
+	  
+	  
+	   
 End Sub
 
 
@@ -96,13 +100,3 @@ End Sub
  End Sub
 
 
-
-
-
-
-
-
-function R_RegisterSkin (_name as ZString ptr ) as image_s ptr
-	
-End Function
-	

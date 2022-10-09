@@ -122,7 +122,7 @@ end type: type mtexinfo_t as mtexinfo_s
 	 numedges as integer '// are backwards edges
 	 
 '// surface generation data	  
-	 as surfcache_s_ ptr cachespots(MIPLEVELS)
+	 as surfcache_s  ptr cachespots(MIPLEVELS)
 
 	  
 	 texturemins(2) as short	
@@ -198,7 +198,7 @@ end type :type mleaf_t as mleaf_s
 
 'ADJUSTED
 ' vec3_t broken needs fixing
-type model_s
+type model_s_
 	_name as ZString * MAX_QPATH 
 	registration_sequence  as integer		
 	
@@ -276,6 +276,11 @@ declare sub	Mod_TouchModel (_name as zstring ptr)
 
 declare function Mod_PointInLeaf (p as float ptr ,model as model_t ptr) as mleaf_t ptr
 declare function Mod_ClusterPVS (cluster as integer ,model as  model_t ptr) as ubyte	ptr
+
+ declare function _Hunk_Begin (maxsize as integer) as any ptr
+ declare function _Hunk_Alloc (_size as integer) as any ptr
+ declare function _Hunk_End () as integer
+ declare sub _Hunk_Free (_base as any ptr)
 
 declare sub  Mod_Modellist_f () 
 declare sub  Mod_FreeAll () 

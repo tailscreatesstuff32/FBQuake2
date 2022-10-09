@@ -92,7 +92,7 @@ End Enum
 ''
 '' 
 ''
- type image_s
+ type image_s_
 	 _name as zstring * MAX_QPATH 
 	_type as imagetype_t
 	as integer _width, _height 
@@ -128,7 +128,6 @@ type viddef_t
  
 End Type
 
- 
 
 
  enum rserr_t
@@ -409,7 +408,7 @@ End Type:type bedge_t as  bedge_s
  End Type:type clipplane_t as clipplane_s
 
 
-type surfcache_s
+type surfcache_s_
  
 	as  surfcache_s ptr      _next 
 	as surfcache_s ptr ptr   owner                '// NULL is an empty chunk of memory
@@ -759,7 +758,7 @@ declare sub  R_InitSkyBox ()
 declare sub  Sys_MakeCodeWriteable (startaddr as ulong , length as ulong ) 
 declare sub   Sys_SetFPCW ()
 
-
+extern	as integer			r_viewcluster, r_oldviewcluster 
 
  
 declare sub R_InitCaches ()
@@ -797,7 +796,7 @@ extern		ri as refimport_t
 ''===GL==================================================GL===========
 ''*/
 
- 
+ declare sub R_GammaCorrectAndSetPalette( _palette as const ubyte ptr)
 declare sub SWimp_BeginFrame(camera_separation as float)
 declare sub SWimp_EndFrame() 
 declare function SWimp_Init(hinstance as any ptr,hWnd as any ptr) as integer

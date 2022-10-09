@@ -8,11 +8,6 @@ dim shared as 	 integer			numr_images
 
 
 
-'/*
-'===============
-'R_ImageList_f
-'===============
-'*/
 
 sub R_ScreenShot_f()
 	
@@ -21,86 +16,56 @@ sub R_ScreenShot_f()
 End Sub
 
 
+'/*
+'===============
+'R_ImageList_f
+'===============
+'*/
 sub	R_ImageList_f ()
  
 	dim i  as integer		
 	dim _image as	image_t	ptr  
 	dim texels  as integer	
 
-	ri.Con_Printf (PRINT_ALL, "------------------\n") 
+	ri.Con_Printf (PRINT_ALL, !"------------------\n") 
 	texels = 0 
-
-
-
-
-  
-	_image=@r_images(0)
-	
-	'for (i=0, image=r_images ; i<numr_images ; i++, image++)
-	'{
-'		if (image->registration_sequence <= 0)
-	'		continue;
-	'	texels += image->width*image->height;
-	'	switch (image->type)
-	'	{
-	'	case it_skin:
-	'		ri.Con_Printf (PRINT_ALL, "M");
-	'		break;
-	'	case it_sprite:
-	'		ri.Con_Printf (PRINT_ALL, "S");
-	'		break;
-	'	case it_wall:
-	'		ri.Con_Printf (PRINT_ALL, "W");
-	'		break;
-	'	case it_pic:
-	'		ri.Con_Printf (PRINT_ALL, "P");
-	'		break;
-	'	default:
-	'		ri.Con_Printf (PRINT_ALL, " ");
-	'		break;
-	'	}
-
-	'	ri.Con_Printf (PRINT_ALL,  " %3i %3i : %s\n",
-	'		image->width, image->height, image->name);
-	'}
-	'ri.Con_Printf (PRINT_ALL, "Total texel count: %i\n", texels);
-	'
-	'
-	'
-	' for i = 0 to numgltextures-1
-   ' 	
-   ' 	
  
-   '  
-	'	if (_image->texnum <= 0) then
-	'		continue for
-	'	end if	
-	'		
-	'	texels += _image->upload_width*_image->upload_height 
-	'	select case (_image->_type)
-	'				case it_skin 
-	'		'ri.Con_Printf (PRINT_ALL, "M") 
-	'	 
-	'	case it_sprite 
-	'		'ri.Con_Printf (PRINT_ALL, "S") 
-	'	 
-	'	case it_wall 
-	'		'ri.Con_Printf (PRINT_ALL, "W") 
-	'		 
-	'	case it_pic 
-	'		'ri.Con_Printf (PRINT_ALL, "P") 
-	'	 
-	'	default:
-	'		'ri.Con_Printf (PRINT_ALL, " ") 
-	'	 
-	'		
-	'		
-	'	End Select
-	' 'ri.Con_Printf (PRINT_ALL,  " %3i %3i %s: %s\n", _
-	''		_image->upload_width, _image->upload_height, palstrings(_image->paletted), _image->_name)
-	'
-	'_image+=1
-	' next
+	_image=@r_images(0)
+ 
+ 
+ 
+	for  i=0 to numr_images 
+	 
+		if (_image->registration_sequence <= 0) then
+			continue for
+		EndIf
+			
+		texels += _image->_width*_image->_height 
+		select case (_image->_type)
+			
+	 case it_skin 
+			ri.Con_Printf (PRINT_ALL, "M") 
+ 
+		case it_sprite 
+			ri.Con_Printf (PRINT_ALL, "S") 
+		 
+		case it_wall 
+			ri.Con_Printf (PRINT_ALL, "W") 
+			 
+		case it_pic 
+			ri.Con_Printf (PRINT_ALL, "P") 
+		 
+			case else
+			ri.Con_Printf (PRINT_ALL, " ") 
+		End Select
+ 
+ 
+		ri.Con_Printf (PRINT_ALL,  !" %3i %3i : %s\n", _
+			_image->_width, _image->_height, _image->_name) 
+			
+			_image+=1
+next
+	ri.Con_Printf (PRINT_ALL, !"Total texel count: %i\n", texels) 
 	
 	
 	
@@ -235,6 +200,7 @@ function R_LoadWal(_name as ZString ptr) as image_t ptr
 	dim as  miptex_t ptr  mt  	 
 	dim as integer		    ofs 
     dim    as 	image_t	ptr	_image 
+    dim _size as integer
 
 	ri.FS_LoadFile (_name, cast(any ptr ptr,@mt)) 
 	if ( mt = null) then
@@ -251,6 +217,17 @@ function R_LoadWal(_name as ZString ptr) as image_t ptr
  _image->_height = LittleLong (mt->_height)
  	_image->_type = it_wall
 	_image->registration_sequence = registration_sequence
+    
+    
+    
+    	_size = _image->_width*_image->_height * (256+64+16+4)/256 
+	_image->pixels(0) = malloc (_size) 
+	_image->pixels(1) = _image->pixels(0) + _image->_width*_image->_height 
+	
+	'_image->pixels(2) = _image->pixels(1) + _image->_width*_image->_height/4 
+	'_image->pixels(3) = _image->pixels(2) + _image->_width*_image->_height/16 
+    
+    
     
     ofs = LittleLong (mt->offsets(1)) 
  
@@ -753,7 +730,7 @@ function R_FindImage (_name as ZString ptr,_type as imagetype_t ) as image_t ptr
 	 '// look for it
 	'for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
 	_image = @r_images(0)	
-	for i = 0 to numr_images
+	for i = 0 to numr_images-1
 	 
  	if ( strcmp(_name, _image->_name) = 0) then
  	  'print "reg"
@@ -830,6 +807,18 @@ Next
 
 End Sub
 ''''''''''''''''''''''''''''''''''''''''''''''''''
+
+'/*
+'===============
+'R_RegisterSkin
+'===============
+'*/
+function R_RegisterSkin (_name as ZString ptr ) as image_s ptr
+	return R_FindImage (_name, it_skin)
+End Function
+	
+
+
 '/*
 '===============
 'R_InitImages
