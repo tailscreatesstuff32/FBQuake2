@@ -19,8 +19,22 @@ sub IN_StartupJoystick ()
 	
 	
 End Sub
+sub Joy_AdvancedUpdate_f
+	
+	
+	
+End Sub
 
+sub  IN_MLookDown
+	
+	
+End Sub
 
+sub  IN_MLookUp
+	
+	
+	
+End Sub
 
 sub IN_init
 	'	// mouse variables
@@ -52,10 +66,10 @@ sub IN_init
 	'v_centermove			= Cvar_Get ("v_centermove",				"0.15",		0);
 	'v_centerspeed			= Cvar_Get ("v_centerspeed",			"500",		0);
 
-	'Cmd_AddCommand ("+mlook", IN_MLookDown);
-	'Cmd_AddCommand ("-mlook", IN_MLookUp);
+	 Cmd_AddCommand ("+mlook", @IN_MLookDown) 
+	 Cmd_AddCommand ("-mlook", @IN_MLookUp) 
 
-	'Cmd_AddCommand ("joy_advancedupdate", Joy_AdvancedUpdate_f);
+	 Cmd_AddCommand ("joy_advancedupdate", @Joy_AdvancedUpdate_f) 
 
 	'IN_StartupMouse ();
 	 IN_StartupJoystick () 

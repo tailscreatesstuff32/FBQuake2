@@ -837,16 +837,17 @@ function WinMain (hInstance as HINSTANCE ,hPrevInstance as  HINSTANCE ,lpCmdLine
     	 'sleep
     	'
     	
-    	
+
     Qcommon_Init (argc, @argv(0))
     oldtime = Sys_Milliseconds ()
 
-    
-    
-' put this in its proper place
+        	' put this in its proper place
 'Sys_CopyProtect ()
+ 
+  
+    
 
-
+  
 	while (1)
 	 
 		''// if at a full screen console, don't update unless needed
@@ -903,6 +904,15 @@ function WinMain (hInstance as HINSTANCE ,hPrevInstance as  HINSTANCE ,lpCmdLine
   	 	'game starts starts here''''
   		Qcommon_Frame (_time) 
       ''''''''''''''''''''''''''''
+      
+      
+      
+
+      
+      
+      
+      
+      
       
   		oldtime = newtime 
    
