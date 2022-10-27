@@ -1,3 +1,4 @@
 *.inc linguist-language=Assembly
 *.S linguist-language=Assembly
 *.bas linguist-language=FreeBasic
+*.h linguist-language=Assembly
