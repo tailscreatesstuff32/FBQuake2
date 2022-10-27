@@ -1,2 +1,3 @@
 *.fbp linguist-detectable=false
 *.inc linguist-detectable=false
+*.bas linguist-language=FreeBasic
