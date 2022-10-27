@@ -3,9 +3,12 @@
 'FINISHED FOR NOW'''''''''''''''''''''''''''''''''''
 '#pragma warning( disable : 4229 )  // mgraph gets this
 
+
+
+
 #include "windows.bi"
-#include once "win/mmsystem.bi"
-#include once "win/d3d.bi"
+#include "win/mmsystem.bi"
+#include "win/d3d.bi"
 #include "win\dsound.bi"
 
 #define	WINDOW_STYLE	(WS_OVERLAPPED or WS_BORDER or WS_CAPTION or WS_VISIBLE)

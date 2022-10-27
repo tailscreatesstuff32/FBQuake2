@@ -1,3 +1,4 @@
+'FINISHED FOR NOW////////////////////////////////////////////////////
 #Include "FB_Ref_Soft\r_local.bi"
 #Include "win32\rw_win.bi"
 
@@ -12,7 +13,7 @@ static shared as  qboolean s_systemcolors_saved
 
 static shared as  HGDIOBJ previously_selected_GDI_obj
 
-static shared as integer s_syspalindices(19) => _ 
+static shared as integer s_syspalindices(0 to ...) => _ 
 { _
   COLOR_ACTIVEBORDER, _
   COLOR_ACTIVECAPTION, _

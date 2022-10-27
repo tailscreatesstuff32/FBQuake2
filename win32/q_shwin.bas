@@ -1,4 +1,4 @@
-' WORK IN PROGRESS''''''''''''''''''''''''''''''''''''
+'FINISHED FOR NOW''''''''''''''''''''''''''''''''''''
 
 
 #Include "qcommon\qcommon.bi"
@@ -21,21 +21,11 @@ dim shared 	cursize as Integer
 
 
 
-dim shared findbase as zstring * MAX_OSPATH
-dim shared findpath as zstring * MAX_OSPATH
-dim shared findhandle as integer
 
 
 #define	VIRTUAL_ALLOC
 
 
-sub	Sys_Mkdir (path as ZString ptr) 
-	
-	_mkdir (path) 
-	
-End Sub
- 
- 
 function _Hunk_Begin ( maxsize as  integer) As any ptr
  
 	'// reserve a huge chunk of memory, but don't commit any yet
@@ -57,7 +47,6 @@ function _Hunk_Begin ( maxsize as  integer) As any ptr
 	
 end function
  
- 
 	function Hunk_Begin ( maxsize as  integer) As any ptr
  
 	'// reserve a huge chunk of memory, but don't commit any yet
@@ -78,72 +67,10 @@ end function
 	return  cast(any ptr,membase)
 	
 end function
- 
- 
- sub  _Hunk_Free (_base as any ptr) 
- 	
- 	
- 	 
- 		if ( _base <> NULL ) then
-#ifdef VIRTUAL_ALLOC
-		 VirtualFree (_base, 0, MEM_RELEASE) 
-#else
-	    free (_base) 
-#endif
- 		end if
- 		
-	hunkcount-=1
- 
-
- 	
- 	
- 	
- End sub
- 
- 
- sub  Hunk_Free (_base as any ptr) 
- 	
- 	
- 	 
- 		if ( _base <> NULL ) then
-#ifdef VIRTUAL_ALLOC
-		 VirtualFree (_base, 0, MEM_RELEASE) 
-#else
-	    free (_base) 
-#endif
- 		end if
- 		
-	hunkcount-=1
- 
-
- 	
- 	
- 	
- End sub
- 
 
 
 
-
-function _Hunk_End () as Integer
- 
-'	// free the remaining unused virtual memory
-#if 0
-	dim buf any ptr
-
-	'// write protect it
-	buf = VirtualAlloc (membase, cursize, MEM_COMMIT, PAGE_READONLY) 
-	if (buf) then
-	'	Sys_Error ("VirtualAlloc commit failed")
-	printf(!"VirtualAlloc commit failed/n") 
-	end if	 
-#endif
-
-	hunkcount+=1
-'//Com_Printf ("hunkcount: %i\n", hunkcount);
-	return cursize 
-end function
- 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
 function _Hunk_Alloc (_size as Integer ) as any ptr
  	
  	
@@ -183,30 +110,6 @@ dim buf as any ptr
 	
 	
  End function
-
-
-
-
-
-
-function Hunk_End () as Integer
- 
-'	// free the remaining unused virtual memory
-#if 0
-	dim buf any ptr
-
-	'// write protect it
-	buf = VirtualAlloc (membase, cursize, MEM_COMMIT, PAGE_READONLY) 
-	if (buf) then
-	'	Sys_Error ("VirtualAlloc commit failed")
-	printf(!"VirtualAlloc commit failed/n") 
-	end if	 
-#endif
-
-	hunkcount+=1
-'//Com_Printf ("hunkcount: %i\n", hunkcount);
-	return cursize 
-end function
  
 function Hunk_Alloc (_size as Integer ) as any ptr
  	
@@ -247,18 +150,92 @@ dim buf as any ptr
 	
 	
  End function
+ 
+
+function _Hunk_End () as Integer
+ 
+'	// free the remaining unused virtual memory
+#if 0
+	dim buf any ptr
+
+	'// write protect it
+	buf = VirtualAlloc (membase, cursize, MEM_COMMIT, PAGE_READONLY) 
+	if (buf) then
+	'	Sys_Error ("VirtualAlloc commit failed")
+	printf(!"VirtualAlloc commit failed/n") 
+	end if	 
+#endif
+
+	hunkcount+=1
+'//Com_Printf ("hunkcount: %i\n", hunkcount);
+	return cursize 
+end function
+ 
 
 
 
 
+function Hunk_End () as Integer
+ 
+'	// free the remaining unused virtual memory
+#if 0
+	dim buf any ptr
 
+	'// write protect it
+	buf = VirtualAlloc (membase, cursize, MEM_COMMIT, PAGE_READONLY) 
+	if (buf) then
+	'	Sys_Error ("VirtualAlloc commit failed")
+	printf(!"VirtualAlloc commit failed/n") 
+	end if	 
+#endif
 
+	hunkcount+=1
+'//Com_Printf ("hunkcount: %i\n", hunkcount);
+	return cursize 
+end function
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+ sub  _Hunk_Free (_base as any ptr) 
+ 	
+ 	
+ 	 
+ 		if ( _base <> NULL ) then
+#ifdef VIRTUAL_ALLOC
+		 VirtualFree (_base, 0, MEM_RELEASE) 
+#else
+	    free (_base) 
+#endif
+ 		end if
+ 		
+	hunkcount-=1
+ 
 
+ 	
+ 	
+ 	
+ End sub
+ 
+  sub  Hunk_Free (_base as any ptr) 
+ 	
+ 	
+ 	 
+ 		if ( _base <> NULL ) then
+#ifdef VIRTUAL_ALLOC
+		 VirtualFree (_base, 0, MEM_RELEASE) 
+#else
+	    free (_base) 
+#endif
+ 		end if
+ 		
+	hunkcount-=1
+ 
 
-
-
-
+ 	
+ 	
+ 	
+ End sub
+ 
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 '/*
 '================
@@ -284,6 +261,17 @@ function Sys_Milliseconds () as integer
 
 	
 End Function
+
+sub	Sys_Mkdir (path as ZString ptr) 
+	
+	_mkdir (path) 
+	
+End Sub
+ 
+
+dim shared findbase as zstring * MAX_OSPATH
+dim shared findpath as zstring * MAX_OSPATH
+dim shared findhandle as integer
 
 function CompareAttributes( found  as UInteger  , musthave as UInteger,canthave as uinteger )   as qboolean static
 
@@ -325,6 +313,9 @@ function CompareAttributes( found  as UInteger  , musthave as UInteger,canthave 
 end function
 
 
+
+
+
  
 
 function Sys_FindFirst (path as zstring ptr, musthave as UInteger, canthave as UInteger) as zstring ptr
@@ -352,30 +343,40 @@ function Sys_FindFirst (path as zstring ptr, musthave as UInteger, canthave as U
 End Function
  
 
-'char *Sys_FindNext ( unsigned musthave, unsigned canthave )
-'{'
-'	struct _finddata_t findinfo;'
+Function Sys_FindNext ( musthave as UInteger ,  canthave  as UInteger ) as zstring ptr
+	
+ dim findinfo  as  _finddata_t 
 
-'	if (findhandle == -1)
-'		return NULL;
-'	if (_findnext (findhandle, &findinfo) == -1)
-'		return NULL;
-'	if ( !CompareAttributes( findinfo.attrib, musthave, canthave ) )
-'		return NULL;
-'
-'	Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.name);
-'	return findpath;
-'}
+ 	if (findhandle  = -1) then
+ 		return NULL 
+ 	EndIf
+ 		
+ 	if (_findnext (findhandle, @findinfo) = -1) then
+ 		return NULL 
+ 	EndIf
+ 		
+ 	if ( CompareAttributes( findinfo.attrib, musthave, canthave ) = 0) then
+ 		return NULL 
+ 	EndIf
+ 		
+ 
+ 	Com_sprintf (findpath, sizeof(findpath), !"%s/%s", findbase, findinfo.name) 
+ 	return @findpath 
+ 
+	
+End Function
+ 
+
 
 
 sub Sys_FindClose ()
  if (findhandle <> -1) then
  	
  	_findclose (findhandle)
- 	findhandle = 0 
+
  EndIf
  	 
- 
+ 	findhandle = 0  
 	
 End Sub
  

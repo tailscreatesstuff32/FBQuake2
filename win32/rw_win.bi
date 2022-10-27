@@ -40,7 +40,7 @@ type swwstate_t
 	as HINSTANCE		hInstance 
 	as any ptr			wndproc 
 	as HDC				hDC 			'	// global DC we're using
-	as HWND			hWnd 				'// HWND of parent window
+	as HWND			  hWnd 				'// HWND of parent window
 
 	as HDC				hdcDIBSection 		'// DC compatible with DIB section
 	as HBITMAP			hDIBSection 		'// DIB section
