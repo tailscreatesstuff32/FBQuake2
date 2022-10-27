@@ -1,1 +1,2 @@
 *.fbp linguist-detectable=false
+*.inc linguist-detectable=false
