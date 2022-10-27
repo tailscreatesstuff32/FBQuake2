@@ -46,11 +46,14 @@
 #endif
 
 
-
+ 
  
  extern	registration_sequence as integer	
  
  
+
+extern as integer	r_dlightframecount
+
  
 #Include "client\ref.bi" 
 
@@ -115,6 +118,9 @@ type vrect_s
  
 End Type:type  vrect_t as  vrect_s 
  
+extern "C"
+extern colormap as any ptr  
+end extern
 
 
 type viddef_t
@@ -174,8 +180,18 @@ type oldrefdef_t
  
 	
 End Type
- 
-extern r_refdef as oldrefdef_t       
+
+
+
+
+
+ extern "C"
+ extern r_refdef as oldrefdef_t  
+ end extern
+     
+
+
+
 
 #Include "FB_Ref_Soft\r_model.bi"
 
@@ -273,7 +289,7 @@ extern r_refdef as oldrefdef_t
 #define SPEED   20
 
 
-
+declare sub R_SetupFrame ()
 
 '/*
 '====================================================
@@ -352,8 +368,8 @@ type affinetridesc_t
  
 	as any ptr                          pskin 
 	as integer                          pskindesc 
-	as integer                          sinwidth 
-	as integer                          sinheight 
+	as integer                          skinwidth 
+	as integer                          skinheight 
 	as dtriangle_t ptr                  ptriangles 
 	as finalvert_t ptr                  pfinalverts 
 	as integer                          numtriangles 
@@ -496,6 +512,9 @@ type  edge_s
 '====================================================
 '*/
 
+
+extern "C"
+
 extern as integer             d_spanpixcount 
 extern as integer              r_framecount           ' // sequence # of current frame since Quake
 									'//  started
@@ -507,8 +526,42 @@ extern as affinetridesc_t  r_affinetridesc
 
 extern as vec3_t   r_pright, r_pup, r_ppn 
 
+end extern
+
+extern "c"
+
+ 
+
+extern as integer								a_sstepxfrac, a_tstepxfrac, r_lstepx, a_ststepxwhole 
+extern as integer								r_sstepx, r_tstepx, r_lstepy, r_sstepy, r_tstepy 
+extern as integer								r_zistepx, r_zistepy 
+extern as integer								d_aspancount, d_countextrastep 
+
+
+
+
+
+extern  as UInteger fpu_sp24_ceil_cw, fpu_ceil_cw, fpu_chop_cw
+end extern
+
+extern as integer              r_amodels_drawn 
+
+declare sub R_PushDlights( model as model_t ptr )
+
+declare sub  R_DrawAlphaSurfaces()
+declare sub R_SetLightLevel()
+
+declare sub R_PrintAliasStats()
+
+declare sub R_PrintTimes()
+
+
+declare sub R_DrawParticles ()
+
+
+
 declare sub D_DrawSurfaces () 
-declare sub R_DrawParticle() 
+declare sub R_DrawParticle naked () 
 declare sub D_ViewChanged () 
 declare sub D_WarpScreen () 
 declare sub R_PolysetUpdateTables () 
@@ -554,21 +607,21 @@ declare function D_CacheSurface (surface as msurface_t ptr, miplevel as integer 
 
 extern as integer      d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle 
 
+extern "c"
 extern as integer      d_pix_min, d_pix_max, d_pix_shift 
 
 
 
-extern as pixel_t ptr d_viewbuffer 
 
-extern "c"
+
 extern as short ptr  d_pzbuffer 
-end extern
 
+extern as pixel_t ptr d_viewbuffer 
 
 extern  as UInteger  d_zrowbytes, d_zwidth 
 extern as short ptr   zspantable(MAXHEIGHT) 
 extern as integer      d_scantable(MAXHEIGHT)
-
+end extern
 
 
 
@@ -576,7 +629,7 @@ extern as integer              d_minmip
 extern as float    d_scalemip(3) 
 
 '//===================================================================
-
+extern "c"
 extern as integer              cachewidth 
 extern as pixel_t  ptr            cacheblock 
 extern as integer              r_screenwidth 
@@ -587,11 +640,20 @@ extern as integer      sintable(1280)
 extern as integer      intsintable(1280) 
 extern as integer		blanktable(1280) 		'// PGM
 
+extern as vec3_t			r_entorigin
+
+
+
 extern as vec3_t  vup, base_vup 
 extern as vec3_t  vpn, base_vpn 
 extern as vec3_t  vright, base_vright 
 
+ 
 extern  as surf_t ptr  surfaces,  surface_p,  surf_max 
+end extern
+
+
+declare sub R_RotateBmodel ()
 
 '// surfaces are generated in back to front order by the bsp, so if a surf
 '// pointer is greater than another one, it should be drawn in front
@@ -600,7 +662,7 @@ extern  as surf_t ptr  surfaces,  surface_p,  surf_max
 '//  attached to an edge_t
 '
 '//===================================================================
-
+extern "C"
 extern as vec3_t   sxformaxis(4)   '// s axis transformed into viewspace
 extern as vec3_t   txformaxis(4)   '// t axis transformed into viewspac
 
@@ -609,11 +671,14 @@ extern as float   xscale, yscale
 extern as float   xscaleinv, yscaleinv 
 extern as float   xscaleshrink, yscaleshrink 
 
+end extern
+
+
 'extern void TransformVector (vec3_t in, vec3_t out);
 'extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 '	fixed8_t endvertu, fixed8_t endvertv);
 
-declare sub TransformVector (_in as vec3_t,_out as vec3_t )
+declare sub TransformVector (_in as vec3_t ptr,_out as vec3_t ptr)
 declare sub SetUpForLineScan(startvertu as fixed8_t ,startvertv as fixed8_t ,endvertu as fixed8_t ,endvertv as fixed8_t ) 
  
  	
@@ -622,7 +687,20 @@ declare sub D_FlushCaches()
 	 
 extern as fixed8_t endvertu, endvertv 
 
-extern as integer      ubasestep, errorterm, erroradjustup, erroradjustdown 
+ extern "C"
+
+ extern as float fv
+ extern as integer current_iv 
+ extern as integer edge_head_u_shift20, edge_tail_u_shift20 
+ extern as edge_t edge_head  
+ extern as espan_t	ptr span_p,  max_span_p 
+ extern as integer ubasestep, errorterm, erroradjustup, erroradjustdown
+ 
+ 
+ 
+ 
+end extern
+
 
 
 '//===========================================================================
@@ -680,7 +758,11 @@ extern as  vec3_t        r_origin
 extern as entity_t	   r_worldentity 
 extern as model_t ptr   currentmodel 
 extern as entity_t ptr    currententity 
+
+extern "c"
 extern as vec3_t  modelorg 
+end extern
+
 extern as vec3_t  r_entorigin 
 
 extern as float   verticalFieldOfView 
@@ -701,7 +783,28 @@ extern as  model_t   ptr        r_worldmodel
 extern "c"
 declare sub R_EdgeCodeStart()
 declare sub R_EdgeCodeEnd()
+
+
+
+extern edge_aftertail as edge_t
+extern edge_tail as edge_t
+
+
+
+
+
 end extern
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -710,7 +813,7 @@ end extern
 '//
 '// current entity info
 '//
-extern as  qboolean                insubmodel 
+extern as  qboolean  insubmodel 
 
 extern as  uinteger d_8to24table(256)
 
@@ -743,7 +846,6 @@ declare sub R_SetPalette ( _palette as const ZString ptr)
 declare function Draw_GetPalette () as Integer
  
 
-declare function R_RegisterSkin (_name as ZString ptr ) as image_s ptr
 
 
 declare function R_FindImage (_name as zstring ptr,_type as imagetype_t ) as image_t ptr
@@ -759,7 +861,7 @@ declare sub  Sys_MakeCodeWriteable (startaddr as ulong , length as ulong )
 declare sub   Sys_SetFPCW ()
 
 extern	as integer			r_viewcluster, r_oldviewcluster 
-
+'extern as integer      ubasestep, errorterm, erroradjustup, erroradjustdown 
  
 declare sub R_InitCaches ()
 declare sub SWimp_SetPalette( _palette as const ubyte ptr  )
@@ -774,14 +876,13 @@ type swstate_s
  	
 end type: type swstate_t as swstate_s
  
-declare sub R_IMFlatShadedQuad(  a as vec3_t, b as vec3_t,c as  vec3_t ,d as vec3_t , _color as  integer ,alpha_ as  float  ) 
- 
+
 extern sw_state as swstate_t
  
 ''/*
 ''===================GL=================================GL============
 ''
-''IMPORTED FUNCTIONS
+'R_RegisterSkin'IMPORTED FUNCTIONS
 ''
 ''=====================================GL=============================
 ''*/
@@ -807,3 +908,90 @@ declare sub  SWimp_EnableLogging(enable as qboolean )
 declare sub  SWimp_LogNewFrame()
 
 
+
+
+declare sub R_IMFlatShadedQuad(  a as vec3_t ptr, b as vec3_t ptr,c as  vec3_t ptr ,d as vec3_t ptr , _color as  integer ,alpha_ as  float  ) 
+ 
+
+declare sub R_ClipAndDrawPoly ( alpha_ as float , isturbulent as integer , textured as qboolean )
+
+
+extern "C"
+extern as qboolean		r_lastvertvalid
+
+extern as integer				r_emitted 
+extern as float			  r_nearzi 
+extern as float			r_u1, r_v1, r_lzi1 
+extern as integer	      r_ceilv1
+extern as qboolean		r_nearzionly
+extern as integer		   cacheoffset 
+
+
+
+extern as edge_t	ptr auxedges 
+extern as edge_t	ptr r_edges,  edge_p,  edge_max 
+ 
+extern as edge_t	 newedges(MAXHEIGHT) 
+extern as edge_t	 removeedges(MAXHEIGHT) 
+ 
+end extern
+
+
+extern "C"
+extern as ubyte irtable(256)
+end extern
+ 
+
+type aliastriangleparms_t
+	as finalvert_t ptr a,  b,  c 
+End Type
+ 
+ 
+extern as float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter 
+
+
+extern "C"
+extern  as UByte iractive		
+end extern
+
+declare sub R_SurfacePatch()
+declare sub R_LightPoint (p as vec3_t ptr ,_color as vec3_t ptr )
+
+
+
+declare sub R_PrintDSpeeds()
+ 
+declare function R_RegisterModel (_name as ZString ptr) as model_s ptr
+
+declare sub R_BeginRegistration (_map as ZString ptr)
+
+
+  declare sub R_SetSky (_name as ZString ptr,rotate as float , axis as  vec3_t ptr)
+
+declare sub R_DrawSprite ()
+ 
+'declare function Draw_FindPic(_name as ZString) as image_s
+ 
+'declare sub Draw_Pic (x as Integer,y as Integer,_name as zstring ptr)
+'declare sub Draw_Char (x as Integer, y as Integer, c as Integer)
+'declare sub	Draw_TileClear (x as Integer, y as Integer, w  as Integer, h  as Integer,_name as zstring ptr)
+'declare sub Draw_Fill (x as Integer,y  as Integer,w  as Integer, h  as Integer,c  as Integer)
+'declare sub Draw_FadeScreen ()
+'
+'
+ declare sub R_DrawBeam(e as entity_t ptr )
+ declare function Draw_FindPic (_name as ZString ptr ) as image_s ptr
+
+extern	as mtexinfo_t		r_skytexinfo(6)
+
+
+declare sub R_DrawSubmodelPolygons (pmodel as model_t ptr,clipflags as integer ,topnode as mnode_t ptr)
+declare sub R_DrawSolidClippedSubmodelPolygons (pmodel as model_t ptr, topnode as mnode_t ptr)
+
+ declare sub R_BeginEdgeFrame ()
+ 	
+ declare sub  R_ScanEdges
+ 
+declare sub R_AliasDrawModel ()
+'
+'declare sub R_RenderFrame (fd as refdef_t ptr)

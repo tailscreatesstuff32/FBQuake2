@@ -7,6 +7,50 @@
 dim shared as surfcache_t	ptr sc_rover,  sc_base 
 
  dim shared as integer _sc_size
+ 
+ 
+extern "C"
+
+extern  as integer				lightleft, sourcesstep, blocksize, sourcetstep 
+extern  as integer				lightdelta, lightdeltastep 
+extern  as integer				lightright, lightleftstep, lightrightstep, blockdivshift 
+extern  as integer		      blockdivmask 
+extern  as any		        ptr prowdestbase 
+extern  as ubyte	        ptr pbasesource 
+extern  as integer				surfrowbytes 	' used by ASM files
+extern  as integer		  ptr r_lightptr 
+extern  as integer				r_stepback 
+extern  as integer				r_lightwidth 
+extern  as integer				r_numhblocks, r_numvblocks 
+extern  as ubyte	ptr r_source, r_sourcemax 
+ 
+end extern 
+ 
+ 
+dim shared as integer				lightleft, sourcesstep, blocksize, sourcetstep 
+dim shared as integer				lightdelta, lightdeltastep 
+dim shared as integer				lightright, lightleftstep, lightrightstep, blockdivshift 
+dim shared as integer		      blockdivmask 
+dim shared as any		        ptr prowdestbase 
+dim shared as ubyte	        ptr pbasesource 
+dim shared as integer				surfrowbytes 	' used by ASM files
+dim shared as integer		  ptr r_lightptr 
+dim shared as integer				r_stepback 
+dim shared as integer				r_lightwidth 
+dim shared as integer				r_numhblocks, r_numvblocks 
+dim shared as ubyte	ptr r_source, r_sourcemax 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 '/*
 '================
 'R_InitCaches

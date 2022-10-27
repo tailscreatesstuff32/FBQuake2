@@ -1,29 +1,9 @@
-'/*
-'Copyright (C) 1997-2001 Id Software, Inc.
-'
-'This program is free software; you can redistribute it and/or
-'modify it under the terms of the GNU General Public License
-'as published by the Free Software Foundation; either version 2
-'of the License, or (at your option) any later version.
-'
-'This program is distributed in the hope that it will be useful,
-'but WITHOUT ANY WARRANTY; without even the implied warranty of
-'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-'
-'See the GNU General Public License for more details.
-'
-'You should have received a copy of the GNU General Public License
-'along with this program; if not, write to the Free Software
-'Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-'
-'*/
-'// 1K random numbers in the range 0-255
-0, 144, 49, 207, 149, 122, 89, 229, 210, 191,
-44, 219, 181, 131, 77, 3, 23, 93, 37, 42,
-253, 114, 30, 1, 2, 96, 136, 146, 154, 155,
-42, 169, 115, 90, 14, 155, 200, 205, 133, 77,
-224, 186, 244, 236, 138, 36, 118, 60, 220, 53,
-199, 215, 255, 255, 156, 100, 68, 76, 215, 6,
+0, 144, 49, 207, 149, 122, 89, 229, 210, 191, _
+44, 219, 181, 131, 77, 3, 23, 93, 37, 42, _
+253, 114, 30, 1, 2, 96, 136, 146, 154, 155, _
+42, 169, 115, 90, 14, 155, 200, 205, 133, 77, _
+224, 186, 244, 236, 138, 36, 118, 60, 220, 53  _
+/'199, 215, 255, 255, 156, 100, 68, 76, 215, 6,
 96, 23, 173, 14, 2, 235, 70, 69, 150, 176,
 214, 185, 124, 52, 190, 119, 117, 242, 190, 27,
 153, 98, 188, 155, 146, 92, 38, 57, 108, 205,
@@ -120,4 +100,4 @@
 75, 122, 223, 20, 25, 36, 36, 235, 79, 95,
 208, 11, 208, 61, 229, 65, 68, 53, 58, 216,
 223, 227, 216, 155, 10, 44, 47, 91, 115, 47,
-228, 159, 139, 233
+228, 159, 139, 233'/

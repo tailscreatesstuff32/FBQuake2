@@ -447,19 +447,21 @@ end function
 
 
 sub DDraw_Shutdown()
+	 
+	
 		if ( sww_state.lpddsOffScreenBuffer ) then
 		   ri.Con_Printf( PRINT_ALL, !"...releasing offscreen buffer\n")
 			sww_state.lpddsOffScreenBuffer->lpVtbl->Unlock( sww_state.lpddsOffScreenBuffer, vid.buffer )
 			sww_state.lpddsOffScreenBuffer->lpVtbl->Release( sww_state.lpddsOffScreenBuffer )
 			sww_state.lpddsOffScreenBuffer = NULL
-
+   
 		EndIf
  
 	if ( sww_state.lpddsBackBuffer ) then
 		ri.Con_Printf( PRINT_ALL,!"...releasing back buffer\n") 
 		sww_state.lpddsBackBuffer->lpVtbl->Release( sww_state.lpddsBackBuffer ) 
 		sww_state.lpddsBackBuffer = NULL 
-
+ 
 	EndIf
  
 	if ( sww_state.lpddsFrontBuffer ) then
@@ -487,6 +489,7 @@ sub DDraw_Shutdown()
 	 ri.Con_Printf( PRINT_ALL, !"...releasing lpDirectDraw\n")
 	 sww_state.lpDirectDraw->lpVtbl->Release( sww_state.lpDirectDraw )
 	 sww_state.lpDirectDraw = NULL
+ 
 	EndIf
  
 	if ( sww_state.hinstDDRAW ) then
@@ -494,6 +497,7 @@ sub DDraw_Shutdown()
 		ri.Con_Printf( PRINT_ALL, !"...freeing library\n") 
 		FreeLibrary( sww_state.hinstDDRAW ) 
 		sww_state.hinstDDRAW = NULL 
+	 
 	EndIf
  
 	

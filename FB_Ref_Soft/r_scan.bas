@@ -1,5 +1,21 @@
 #Include "FB_Ref_Soft\r_local.bi"
 
+
+
+
+
+extern "C"
+ extern as ubyte	ptr r_turb_pbase, r_turb_pdest
+ extern as fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep 
+ extern as integer			   r_turb_turb 
+ extern as integer			 	r_turb_spancount
+end extern
+
+
+
+
+
+
 dim shared as ubyte	ptr r_turb_pbase, r_turb_pdest 
 dim shared as fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep 
 dim shared as integer			   r_turb_turb 

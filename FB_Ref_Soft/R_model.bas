@@ -500,6 +500,49 @@ function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
 	
 End Function
   
+  
+  
+  
+  
+  
+  
+  
+  
+/'
+===================
+Mod_DecompressVis
+===================
+'/
+function Mod_DecompressVis (_in as ubyte ptr,model as model_t ptr )as ubyte ptr
+	
+End Function
+
+
+  
+'  /*
+'==============
+'Mod_ClusterPVS
+'==============
+'*/
+function Mod_ClusterPVS ( cluster as integer, model as model_t ptr) as ubyte ptr
+	
+		if (cluster =  -1 or  model->vis = null) then
+			return @mod_novis(0)
+		EndIf
+
+ 	return Mod_DecompressVis ( cast(ubyte ptr,model->vis) + model->vis->bitofs(cluster,DVIS_PVS), _
+	 	model) 
+End Function
+ 
+
+  
+  
+  
+  
+  
+  
+  
+  
 function R_RegisterModel (_name as ZString ptr) as model_s ptr
  
  	dim _mod  as model_t	ptr

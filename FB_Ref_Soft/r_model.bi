@@ -231,9 +231,9 @@ type model_s_
    numedges  as integer	
    		
    edges as medge_t ptr
- 	numnode as	integer
+ 	numnodes as	integer
  			
-   firstnod as	integer	
+   firstnode as	integer	
    nodes  as mnode_t	ptr
    
    numtexinfo   as integer			
