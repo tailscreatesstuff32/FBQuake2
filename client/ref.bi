@@ -65,7 +65,7 @@ type entity_s
 	lightstyle as Integer
 	alpha_ as float	
  	skin as image_s  ptr
-	flag as integer
+	flags as integer
 
 end type: type entity_t as entity_s 
 
