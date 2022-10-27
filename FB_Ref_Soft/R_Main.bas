@@ -1,5 +1,4 @@
-
- '#define id386	1
+'FINISHED FOR NOW////////////////////////////////////////////////////////////////
 
 #Include "FB_Ref_Soft\r_local.bi"
 
@@ -24,6 +23,10 @@ dim shared as ubyte r_warpbuffer(WARP_WIDTH * WARP_HEIGHT)
 
 dim shared sw_state as swstate_t
 
+
+
+
+
 dim shared as any ptr   colormap 
 dim shared as vec3_t		viewlightvec 
 dim shared as alight_t	r_viewlighting: r_viewlighting.ambientlight = 128:r_viewlighting.shadelight = 192:r_viewlighting.plightvec = cast(float ptr,@viewlightvec) 
@@ -43,8 +46,8 @@ dim shared as qboolean	r_surfsonstack
 dim shared as integer   r_clipflags 
 
 
-dim shared vup as vec3_t
-dim shared vpn as vec3_t
+dim shared as vec3_t vup,base_vup
+dim shared as vec3_t vpn ,base_vpn
 dim shared as vec3_t	vright, base_vright
 dim shared r_origin as vec3_t
 
@@ -125,22 +128,6 @@ dim shared as cvar_t ptr sw_lockpvs
 #define	STRINGER(x) "x"
 
 
- 'dim shared as short ptr d_pzbuffer 
- 
- 'asm
- '	
- '	 
- '	
- '	
- '	
- '	
- '  d_pzbuffer:.LONG 100
- ' 	
- '
- 'End Asm
- ''
- '' dim shared i as short 
- ' d_pzbuffer =  @i
  
  
  
@@ -203,13 +190,6 @@ for m = 0 to 4-1
 	Next
 Next
 
-
-
-
-
-
-
-
 end sub
 
 
@@ -218,81 +198,25 @@ end sub
 
 
 
-
-
-
 '/*
-'@@@@@@@@@@@@@@@@@@@@@
-'GetRefAPI
-'
-'@@@@@@@@@@@@@@@@@@@@@
+'================
+'R_InitTurb
+'================
 '*/
+sub R_InitTurb ()
+dim as	integer		i
+
+for i = 0 to 1280-1
+sintable(i) = AMP + sin(i*3.14159*2/CYCLE)*AMP
+intsintable(i) = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2	'// AMP2, not 20
+blanktable(i) = 0			'//PGM
+
+Next
 
 
-
-
-declare sub R_BeginRegistration (_map as ZString ptr)
-declare function R_RegisterModel (_name as ZString) as model_s ptr
-'declare function R_RegisterSkin (_name as ZString) as image_s
-declare sub R_SetSky (_name as ZString ptr,rotate as float , axis as  vec3_t)
-
-
-'
-declare sub R_RenderFrame (fd as refdef_t ptr)
-'
-declare function Draw_FindPic(_name as ZString) as image_s
-'
-'
-'declare sub Draw_Pic (x as Integer,y as Integer,_name as zstring ptr)
-'declare sub Draw_Char (x as Integer, y as Integer, c as Integer)
-'declare sub	Draw_TileClear (x as Integer, y as Integer, w  as Integer, h  as Integer,_name as zstring ptr)
-'declare sub Draw_Fill (x as Integer,y  as Integer,w  as Integer, h  as Integer,c  as Integer)
-'declare sub Draw_FadeScreen ()
-'
-'
-
-declare sub R_CinematicSetPalette( _palette as const zstring ptr  )
-
-
-
-function Draw_GetPalette () as integer
-	dim as ubyte ptr 	 _out,  _pal
-	dim i  as integer
-	dim as integer 	r, g, b
-
-
-	LoadPCX ("pics/colormap.pcx", @vid.colormap, @_pal, NULL, NULL)
-	if (vid.colormap = NULL) then
-		'ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx")
-		print "Couldn't load pics/colormap.pcx"
-		return 0
-	EndIf
-	vid.alphamap = vid.colormap + 64*256
-
-	for i = 0 to 256-1
-
-		r = _pal[i*3+0]
-		g = _pal[i*3+1]
-		b = _pal[i*3+2]
-
-
-	Next
-
-
-
-	free (_pal)
-
-	return 0
-
-End Function
-
-
-
-
+End Sub
 
 declare sub R_ImageList_f()
-
-
 
 sub R_register
 
@@ -338,26 +262,11 @@ vid_gamma->modified = true '// force us to rebuild the gamma table later
 
 End Sub
 
-'/*
-'================
-'R_InitTurb
-'================
-'*/
-sub R_InitTurb ()
-dim as	integer		i
-
-for i = 0 to 1280-1
-sintable(i) = AMP + sin(i*3.14159*2/CYCLE)*AMP
-intsintable(i) = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2	'// AMP2, not 20
-blanktable(i) = 0			'//PGM
-
-Next
-
-
+sub R_UnRegister ()
+	ri.Cmd_RemoveCommand( "screenshot" )
+	ri.Cmd_RemoveCommand ("modellist")
+	ri.Cmd_RemoveCommand( "imagelist" )
 End Sub
-
-
-
 
 
 
@@ -365,21 +274,16 @@ End Sub
 function R_init(hinstance as any ptr,wndproc as any ptr) as qboolean
 
 'COMPLETE ADDED''''''''''''''''''''''''''''''''''''
+ 
 
 
-
-
+ 
 R_InitImages ()
 Mod_Init ()
 Draw_InitLocal ()
 R_InitTextures
 
 R_InitTurb ()
-
-
-
-
-
 
 view_clipplanes(0).leftedge = true
 view_clipplanes(1).rightedge = true
@@ -394,26 +298,14 @@ r_refdef.yOrigin = YCENTERING
 '// TODO: collect 386-specific code in one place
 '#if
 
-'NOT SURE IF I DID THIS RIGHT
-#ifdef id386
-'printf(!"%i\n",cast(long,@R_EdgeCodeStart ))
-'printf(!"%i\n",cast(long,@R_EdgeCodeEnd ))
-
+ #ifdef id386
  
-   'print  cast(long,@R_EdgeCodeStart ) 
-  ' print  cast(long,@R_EdgeCodeEnd )
-   'print  cast(long,@R_EdgeCodeEnd ) - cast(long,@R_EdgeCodeStart )
-   
-    
+ 
     
 Sys_MakeCodeWriteable (cast(long,@R_EdgeCodeStart ), _
 cast(long,@R_EdgeCodeEnd ) - cast(long,@R_EdgeCodeStart ))
 Sys_SetFPCW () 		'// get bit masks for FPCW	(FIXME: is this id386?)
-
-'printf(!"%i\n",cast(long,@R_EdgeCodeStart ))
-'printf(!"%i\n",cast(long,@R_EdgeCodeEnd ))
-' printf(!"%i\n",cast(long,@R_EdgeCodeEnd ) - cast(long,@R_EdgeCodeStart ))
-
+ 
 
 #endif	'// id386
 
@@ -426,45 +318,16 @@ SWimp_Init( hInstance, wndProc )
 
 
 'CREATE WINDOW
-R_BeginFrame( 0 )
+ R_BeginFrame( 0 )
 '''''''''''''''''''''''''''''''''''''''''''''''''
 
-ri.Con_Printf (PRINT_ALL, !"ref_soft version: " REF_VERSION !"\n")
+ ri.Con_Printf (PRINT_ALL, !"ref_soft version: " REF_VERSION !"\n")
 
 return _true
 
 
 End function
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-
-
-
-
-
-
-
-
-
-sub R_CinematicSetPalette( _palette as const zstring ptr  )
-
-End Sub
-
-sub R_setSky(_name as zstring ptr,rotate as float, axis as vec3_t)
-
-
-End Sub
-
-
-sub R_RenderFrame (fd as refdef_t ptr)
-
-
-End Sub
-
-
-
 
 
 'FINISHED'''''''''''''''''''''
@@ -502,25 +365,766 @@ SWimp_Shutdown() 'FINISHED
 End Sub
 ''''''''''''''''''''''''''''''''''''''''
 
-'/*
-'** R_GammaCorrectAndSetPalette
-'*/
-sub R_GammaCorrectAndSetPalette( _palette as const ubyte ptr)
-	dim as integer i
+ 
 
-	for  i = 0 to 256-1
-		sw_state.currentpalette(i*4+0) = sw_state.gammatable(_palette[i*4+0])
-		sw_state.currentpalette(i*4+1) = sw_state.gammatable(_palette[i*4+1])
-		sw_state.currentpalette(i*4+2) = sw_state.gammatable(_palette[i*4+2])
+/'
+===============
+R_NewMap
+===============
+'/
+sub R_NewMap ()
+ 
+	r_viewcluster = -1 
 
-	Next
+	r_cnumsurfs = sw_maxsurfs->value 
+
+	if (r_cnumsurfs <= MINSURFACES) then
+		r_cnumsurfs = MINSURFACES 
+	EndIf
+		
+
+ if (r_cnumsurfs > NUMSTACKSURFACES) then
+ 
+ 		surfaces = malloc (r_cnumsurfs * sizeof(surf_t)) 
+	 	surface_p = surfaces 
+	 	surf_max =  @surfaces[r_cnumsurfs] 
+	 	r_surfsonstack = false 
+	'// surface 0 doesn't really exist; it's just a dummy because index 0
+	'// is used to indicate no edge attached to surface
+	 	surfaces-=1
+	  R_SurfacePatch () 
+ 
+ 	else
+ 
+   	r_surfsonstack = true 
+	endif
+
+	 r_maxedgesseen = 0 
+	 r_maxsurfsseen = 0 
+
+	 r_numallocatededges = sw_maxedges->value 
+
+	 if (r_numallocatededges < MINEDGES) then
+	 	r_numallocatededges = MINEDGES
+	 	
+	 	
+	 EndIf
+ 
+ if (r_numallocatededges <= NUMSTACKEDGES) then
+ 
+ 		auxedges = NULL 
+	 
+	 else
+	 
+   	auxedges = malloc (r_numallocatededges * sizeof(edge_t)) 
+	end if
+end sub
 
 
-	 SWimp_SetPalette( @sw_state.currentpalette(0) )
 
+
+
+
+sub R_MarkLeaves()
+ 	dim as ubyte ptr vis 
+ 	dim as mnode_t	 ptr node 
+ 	dim as integer		i 
+ 	dim as mleaf_t ptr leaf 
+ 	dim as integer 	 cluster 
+ 
+ 	if (r_oldviewcluster =  r_viewcluster and  r_novis->value = NULL and r_viewcluster <> -1) then
+ 		return 
+ 	end if
+'	
+'	// development aid to let you run around and see exactly where
+'	// the pvs ends
+ 	if (sw_lockpvs->value) then
+ 		return 
+ 	EndIf
+ 		
+ 
+ 	r_visframecount+=1
+ 	r_oldviewcluster = r_viewcluster 
+ 
+ 	if (r_novis->value or r_viewcluster = -1 or  r_worldmodel->vis = NULL) then
+  
+'		// mark everything
+ 		for  i=0  to r_worldmodel->numleafs -1 
+ 			r_worldmodel->leafs[i].visframe = r_visframecount 
+ 		next
+     for  i=0  to r_worldmodel->numnodes -1 
+ 			r_worldmodel->nodes[i].visframe = r_visframecount 
+     next
+ 		return 
+ 
+ 		
+ 	EndIf
+
+ 
+ 	vis = Mod_ClusterPVS (r_viewcluster, r_worldmodel) 
+ 	
+ 
+leaf=r_worldmodel->leafs
+  for i = 0 to r_worldmodel->numleafs-1
+  	
+  	
+
+ 
+ 		cluster = leaf->cluster 
+ 		if (cluster =  -1) then
+ 			 continue for
+ 		end if
+ 		
+ 		if (vis[cluster shr 3] and (1 shl (cluster and 7))) then
+ 
+ 	   	node = cast(mnode_t ptr,leaf) 
+ 			do
+ 			 
+ 				if (node->visframe =  r_visframecount) then
+ 					exit do
+ 				EndIf
+ 			 
+ 				node->visframe = r_visframecount 
+ 				node = node->parent 
+ 		  loop while (node) 
+ 		end if
+ 		leaf+=1
+next
+'
+ #if 0
+ 	for (i=0  =r_worldmodel->vis->numclusters -1 
+ 
+ 		if (vis[cluster shr 3] and (1 shl (cluster and 7))) then
+ 
+ 			node = cast(mnode_t ptr,@r_wo rldmodel->leafs(i)) 	'// FIXME: cluster
+   		do
+ 
+ 				if (node->visframe =  r_visframecount) then
+   				exit do 
+ 				node->visframe = r_visframecount 
+ 				node = node->parent 
+ 		  while (node) 
+    end if
+ next
+ #endif
 End Sub
 
 
+
+
+ /'
+** R_DrawNullModel
+**
+** IMPLEMENT THIS!
+'/
+sub R_DrawNullModel()
+End Sub
+''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+sub R_DrawEntitiesOnList()
+	 
+	 dim as integer			i  
+	 dim as qboolean	translucent_entities = false 
+
+	 if ( r_drawentities->value = NULL) then
+	 	return
+	 EndIf
+ 
+
+	'// all bmodels have already been drawn by the edge list
+ 
+	for i = 0 to r_newrefdef.num_entities -1
+ 
+ 		currententity = @r_newrefdef.entities[i] 
+
+	 	if ( currententity->flags and RF_TRANSLUCENT ) then
+	 		translucent_entities = true
+	 		continue for
+	 	EndIf
+	 
+
+	 	if ( currententity->flags and RF_BEAM ) then
+	 
+	 		modelorg.v(0) = -r_origin.v(0) 
+	 		modelorg.v(1) = -r_origin.v(1) 
+	 		modelorg.v(2) = -r_origin.v(2) 
+	 		_VectorCopy( @vec3_origin, @r_entorigin ) 
+	 		R_DrawBeam( currententity ) 
+	 
+	 	else
+	 
+	 		currentmodel = currententity->model 
+	 		if ( currentmodel = NULL) then
+	 			R_DrawNullModel() 
+	 			 continue for	
+	 		EndIf
+ 
+	 		
+          
+	 		_VectorCopy(@currententity->origin(0), @r_entorigin) 
+	 		_VectorSubtract (@r_origin, @r_entorigin, @modelorg) 
+
+	 select case  (currentmodel->_type)
+	 
+	 		case mod_sprite 
+	 			 R_DrawSprite () 
+ 
+
+	 		case mod_alias 
+	 			 R_AliasDrawModel () 
+	  
+
+	 		 case else
+	 end select
+ 
+	  end if
+	next
+
+	 if (  translucent_entities <> null) then
+	 	return
+	 EndIf
+	 
+	 for  i=0  to r_newrefdef.num_entities - 1
+	 
+	 		currententity = @r_newrefdef.entities[i] 
+
+	 	if ( ( currententity->flags and RF_TRANSLUCENT ) ) then
+	 			continue for
+	 	EndIf
+	 	
+
+   	if ( currententity->flags and RF_BEAM ) then
+ 
+	 		modelorg.v(0) = -r_origin.v(0) 
+	 		modelorg.v(1) = -r_origin.v(1) 
+	 		modelorg.v(2) = -r_origin.v(2) 
+	 		_VectorCopy( @vec3_origin, @r_entorigin ) 
+	 		R_DrawBeam( currententity ) 
+	 
+	 	else
+	 
+	 		currentmodel = currententity->model 
+	 		if ( currentmodel = NULL) then
+   			R_DrawNullModel() 
+	   		continue for
+	 		EndIf
+ 
+ 
+	 		_VectorCopy (@currententity->origin(0), @r_entorigin) 
+	   	_VectorSubtract (@r_origin, @r_entorigin,@modelorg) 
+
+   		select case (currentmodel->_type)
+ 
+	  		case mod_sprite:
+	 			R_DrawSprite () 
+ 
+
+	 		case mod_alias 
+	 			R_AliasDrawModel () 
+ 
+
+	   	case else
+ 
+	 end select
+   	end if
+   	
+   next	
+   	
+End Sub
+
+
+function R_BmodelCheckBBox (minmaxs as float ptr) as Integer
+	
+  dim as integer	ptr  pindex
+  dim as integer clipflags
+  dim as integer i
+	dim as vec3_t		acceptpt, rejectpt 
+	dim as  float		d 
+
+	clipflags = 0 
+
+	for  i=0 to 4-1
+		
+
+ 
+	'// generate accept and reject points
+	'// FIXME: do with fast look-ups or integer tests based on the sign bit
+	'// of the floating point values
+
+		pindex = pfrustum_indexes(i)
+
+		rejectpt.v(0) = minmaxs[pindex[0]] 
+		rejectpt.v(1) = minmaxs[pindex[1]] 
+		rejectpt.v(2) = minmaxs[pindex[2]] 
+		
+		d = DotProduct (@rejectpt, @view_clipplanes(i).normal) 
+		d -= view_clipplanes(i).dist 
+
+		if (d <= 0) then
+			return BMODEL_FULLY_CLIPPED 
+		EndIf
+			
+
+		acceptpt.v(0) = minmaxs[pindex[3+0]] 
+		acceptpt.v(1) = minmaxs[pindex[3+1]] 
+		acceptpt.v(2) = minmaxs[pindex[3+2]] 
+
+		d = DotProduct (@acceptpt, @view_clipplanes(i).normal) 
+		d -= view_clipplanes(i).dist 
+
+		if (d <= 0) then
+			clipflags or= (1 shl (i)) 
+		EndIf
+			
+ 	Next
+
+	return clipflags 
+End function
+
+ 
+/'
+===================
+R_FindTopnode
+
+Find the first node that splits the given box
+===================
+'/
+function R_FindTopnode (mins as vec3_t ptr ,maxs as vec3_t ptr ) as mnode_t ptr
+ 	dim as mplane_t	ptr splitplane 
+	dim as integer			sides
+	dim as mnode_t ptr node 
+
+	 node = r_worldmodel->nodes 
+
+	 while (1)
+	 
+ 		if (node->visframe <> r_visframecount) then
+ 			return NULL
+ 		EndIf
+ 
+	 
+   	if (node->contents <> CONTENTS_NODE) then
+   		if (node->contents <> CONTENTS_SOLID) then
+   			return	node '//  visible and not BSP clipped
+   			
+   		EndIf
+   		return NULL 	'// in solid, so not visible
+   	EndIf
+ 
+	'						
+	'		
+ 
+	'	
+	 	splitplane = node->plane 
+	 	sides = BOX_ON_PLANE_SIDE(mins, maxs, cast(cplane_t ptr,splitplane)) 
+	'	
+	 	if (sides = 3) then
+	 		return node '	// this is the splitter
+	 	EndIf
+	 
+	 	
+	'// not split yet; recurse down the contacted side
+	 	if (sides and 1) then
+		  		node = node->children(0) 
+	 	else
+	 		node = node->children(1)  		
+	 	EndIf
+
+	wend
+ 	
+	
+End function
+ 
+ 
+ /'
+=============
+RotatedBBox
+
+Returns an axially aligned box that contains the input box at the given rotation
+=============
+'/
+sub RotatedBBox (mins as vec3_t ptr ,maxs as vec3_t ptr,angles as vec3_t ptr,  tmins as vec3_t ptr, tmaxs as vec3_t ptr)
+ 
+	 dim as vec3_t	tmp, _v 
+	 dim as integer		i, j 
+	 dim as vec3_t	forward, _right, up 
+
+	 if ( angles->v(0) = null and angles->v(1) = null and angles->v(2) = null) then
+	 	_VectorCopy (mins, tmins)
+	 	_VectorCopy (maxs, tmaxs)
+	 	return
+	 EndIf
+ 
+	 for i=0 to 3-1
+	 	tmins->v(i) = 99999 
+	 	tmaxs->v(i) = -99999 
+	 
+	 Next
+ 
+	 AngleVectors (angles, @forward, @_right,@up) 
+
+	  
+	 for   i = 0 to 8-1 
+	 	
+	 if ( i and 1 ) then
+	 	tmp.v(0) = mins->v(0)
+	 else
+	 	tmp.v(0) = maxs->v(0)	
+	 EndIf
+	 	if ( i and 2 ) then
+	 		tmp.v(1) = mins->v(1)
+	 	else
+	   	tmp.v(1) = maxs->v(1)
+	 	end if
+    	if ( i and 4 ) then
+    	   tmp.v(2) = mins->v(2)
+	 	else
+	   	tmp.v(2) = maxs->v(2)
+    	EndIf
+    	
+	 Next
+ 
+  
+	   VectorScale (@forward, tmp.v(0), @_v) 
+	 	VectorMA (@_v, -tmp.v(1), @_right, @_v) 
+	 	VectorMA (@_v, tmp.v(2), @up, @_v) 
+
+	 	for j = 0 to 3-1
+	 	 	if (_v.v(j) < tmins->v(j)) then
+	 	 		tmins->v(j) = _v.v(j)
+	 	 	EndIf
+	 	 	if (_v.v(j) > tmaxs->v(j)) then
+	 	 	   tmaxs->v(j) = _v.v(j)
+	 	 	EndIf
+ 
+	 	Next
+ 
+end sub
+ 
+ 
+sub R_DrawBEntitiesOnList()
+ 	 dim as integer   i, clipflags 
+	 dim as vec3_t		oldorigin 
+	 dim as vec3_t		mins, maxs 
+	 dim as float		minmaxs(6) 
+	 dim as mnode_t	ptr	 topnode 
+
+  if ( r_drawentities->value = NULL) then
+  	return
+  EndIf
+ 
+
+	 _VectorCopy (@modelorg, @oldorigin) 
+	  insubmodel = true 
+	 r_dlightframecount = r_framecount 
+
+ 
+  for i = 0 to r_newrefdef.num_entities -1
+ 		currententity = @r_newrefdef.entities[i]
+	 	currentmodel = currententity->model 
+	 	if ( currentmodel = NULL) then
+	 		 continue for
+	 	EndIf
+	 
+	 	if (currentmodel->nummodelsurfaces =  0) then
+	 	 	continue for ' // clip brush only
+	 	EndIf
+	 		
+	 	if ( currententity->flags and RF_BEAM ) then
+	 		 continue for 
+	 	EndIf
+	
+	 	if (currentmodel->_type <> mod_brush) then
+	 		 continue for 
+	 	EndIf
+	 		
+	'// see if the bounding box lets us trivially reject, also sets
+	'// trivial accept status
+	 	RotatedBBox (@currentmodel->mins, @currentmodel->maxs, _
+	 		@currententity->angles(0), @mins, @maxs) 
+	 	_VectorAdd (@mins, @currententity->origin(0), @minmaxs(0)) 
+	 	_VectorAdd (@maxs, @currententity->origin(0), @minmaxs(0)+3) 
+
+	 	clipflags = R_BmodelCheckBBox (@minmaxs(0)) 
+	 	if (clipflags =  BMODEL_FULLY_CLIPPED) then
+	 	 		continue for	'// off the edge of the screen
+	 	EndIf
+	
+
+	 	topnode = R_FindTopnode (@minmaxs(0), @minmaxs(0)+3 ) 
+	 	if ( topnode = NULL) then
+	 	 	 	continue for	'// no part in a visible leaf	
+	 	EndIf
+	
+
+	 	_VectorCopy (@currententity->origin(0), @r_entorigin) 
+	 	_VectorSubtract (@r_origin, @r_entorigin, @modelorg) 
+
+	 	r_pcurrentvertbase = currentmodel->vertexes 
+
+	'// FIXME: stop transforming twice
+	 	R_RotateBmodel () 
+
+	'// calculate dynamic lighting for bmodel
+	 	R_PushDlights (currentmodel) 
+
+	 	if (topnode->contents = CONTENTS_NODE) then
+	 		'	// not a leaf; has to be clipped to the world BSP
+	 		r_clipflags = clipflags
+	 		 R_DrawSolidClippedSubmodelPolygons (currentmodel, topnode)
+	 	EndIf
+ 
+	'	}
+	'	else
+	'	{
+	'	// falls entirely in one leaf, so we just put all the
+	'	// edges in the edge list and let 1/z sorting handle
+	'	// drawing order
+	 		R_DrawSubmodelPolygons (currentmodel, clipflags, topnode) 
+	'	}
+
+	'// put back world rotation and frustum clipping		
+	'// FIXME: R_RotateBmodel should just work off base_vxx
+	 	_VectorCopy (@base_vpn, @vpn) 
+	   _VectorCopy (@base_vup, @vup) 
+	 	_VectorCopy (@base_vright, @vright) 
+	 	_VectorCopy (@oldorigin, @modelorg) 
+	 	R_TransformFrustum () 
+	next
+
+ 	insubmodel = false 
+End Sub
+	
+
+sub R_EdgeDrawing 
+	 dim as 	edge_t	ledges(NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(edge_t)) + 1) 
+	 			
+	 dim as 	surf_t	lsurfs(NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(surf_t)) + 1)  
+	 		
+
+	 if ( r_newrefdef.rdflags and RDF_NOWORLDMODEL ) then
+	 	return
+	 EndIf
+ 
+
+	 if (auxedges) then
+	 
+ 		r_edges = auxedges 
+ 
+	 else
+ 
+ 		r_edges =  cast(edge_t ptr,  ((cast(long,@ledges(0)) + CACHE_SIZE - 1)  and not(CACHE_SIZE - 1))) 
+	 			
+	end if
+
+ if (r_surfsonstack) then
+ 	
+ 	
+ 	surfaces =  cast(surf_t ptr,((cast(long,@lsurfs(0)) + CACHE_SIZE - 1) and not(CACHE_SIZE - 1)))
+	surf_max = @surfaces[r_cnumsurfs] 
+		'// surface 0 doesn't really exist; it's just a dummy because index 0
+	   '// is used to indicate no edge attached to surface
+ 	surfaces-=1
+ 	R_SurfacePatch ()
+ EndIf
+
+ 	R_BeginEdgeFrame () 
+
+	 if (r_dspeeds->value) then
+	 	rw_time1 = Sys_Milliseconds () 
+	 EndIf
+ 
+ 	 R_RenderWorld () 
+
+	 if (r_dspeeds->value) then
+	  rw_time2 = Sys_Milliseconds () 
+   	db_time1 = rw_time2 
+	 EndIf
+ 
+	 R_DrawBEntitiesOnList () 
+
+	 if (r_dspeeds->value) then
+ 		db_time2 = Sys_Milliseconds () 
+	 	se_time1 = db_time2 
+	end if
+
+	 R_ScanEdges () 
+	
+End Sub
+
+
+
+sub R_CalcPalette
+	static as qboolean modified 
+	static as ubyte ptr	_palette(256,4) ,  _in,  _out 
+	dim as integer		i, j 
+	dim as float	alpha_, one_minus_alpha 
+	dim as vec3_t	premult 
+	dim as integer		v 
+
+ 	alpha_ = r_newrefdef.blend(3)
+ 	if (alpha_ <= 0) then
+ 		if (modified) then
+ 			'// set back to default
+ 			modified = false
+ 			R_GammaCorrectAndSetPalette(cast( const ubyte ptr, @d_8to24table(0) ))
+	      return
+ 		EndIf
+ 		return
+ 	EndIf
+ modified = true
+  if (alpha_ > 1)  then
+  	alpha_ = 1 
+  EndIf
+  
+ 
+ 
+ 	premult.v(0) = r_newrefdef.blend(0)*alpha_*255 
+ 	premult.v(1) = r_newrefdef.blend(1)*alpha_*255 
+ 	premult.v(2) = r_newrefdef.blend(2)*alpha_*255 
+ 
+ 	one_minus_alpha = (1.0 - alpha_) 
+ 
+ 	_in = cast(ubyte ptr,@d_8to24table(0) )
+ 	_out = _palette(0,0) 
+ 	for i = 0 to 256-1
+ 		for j = 0 to 3-1
+ 	      v = premult.v(j) + one_minus_alpha * _in[j]
+ 			if (v > 255) then
+ 				v = 255 
+ 			end if
+ 			_out[j] = v 
+ 		Next
+ 		 
+ 		_out[3] = 255
+ 		
+ 		_in +=4
+ 		_out +=4
+ 	Next
+ 	
+ 
+ 	R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @_palette(0,0)) ) 
+
+'//	SWimp_SetPalette( palette[0] );
+	
+End Sub
+
+ sub  R_SetLightLevel()
+		dim light as vec3_t		 
+
+	if ((r_newrefdef.rdflags and RDF_NOWORLDMODEL) or ( r_drawentities->value = NULL) or ( currententity = NULL)) then
+	   r_lightlevel->value = 150.0 
+		return 
+	EndIf
+ 
+	'// save off light value for server to look at (BIG HACK!)
+	R_LightPoint (@r_newrefdef.vieworg(0), @light) 
+	r_lightlevel->value = 150.0 * light.v(0) 
+	
+ End Sub
+
+
+/'
+@@@@@@@@@@@@@@@@
+R_RenderFrame
+
+@@@@@@@@@@@@@@@@
+'/
+	
+sub R_RenderFrame (fd as refdef_t ptr)
+	r_newrefdef = *fd 
+
+	if ( r_worldmodel = 0 and  ( r_newrefdef.rdflags and RDF_NOWORLDMODEL ) = 0 ) then
+		ri.Sys_Error (ERR_FATAL,"R_RenderView: NULL worldmodel")
+	EndIf
+		
+
+	 'VectorCopy (@fd->vieworg, @r_refdef.vieworg) 
+	  _VectorCopy (@fd->vieworg(0), @r_refdef.vieworg) 
+	 
+	  'VectorCopy (@fd->viewangles(0), @r_refdef.viewangles ) 
+     _VectorCopy (@fd->viewangles(0), @r_refdef.viewangles ) 
+    
+    
+	if (r_speeds->value or r_dspeeds->value) then
+		r_time1 = Sys_Milliseconds () 
+	EndIf
+		
+
+	 R_SetupFrame () 
+
+	  R_MarkLeaves () 	'// done here so we know if we're in water
+
+	  R_PushDlights (r_worldmodel) 
+
+	 R_EdgeDrawing ()  
+
+	 if (r_dspeeds->value) then
+	   se_time2 = Sys_Milliseconds () 
+	 	de_time1 = se_time2 
+	 EndIf
+ 
+
+	  R_DrawEntitiesOnList () 
+
+	 if (r_dspeeds->value) then
+	 	 		de_time2 = Sys_Milliseconds () 
+	 	dp_time1 = Sys_Milliseconds () 
+	 EndIf
+ 
+
+	 R_DrawParticles () 
+
+	 if (r_dspeeds->value) then
+	 	dp_time2 = Sys_Milliseconds ()
+	 EndIf
+ 
+
+	 R_DrawAlphaSurfaces()
+
+	 R_SetLightLevel () 
+
+	 if (r_dowarp) then
+	 	D_WarpScreen ()
+	 EndIf
+ 
+	 if (r_dspeeds->value) then
+	 	da_time1 = Sys_Milliseconds ()
+	 EndIf
+	    
+
+	 if (r_dspeeds->value) then
+	 	da_time2 = Sys_Milliseconds ()
+	 EndIf
+ 
+	 R_CalcPalette () 
+
+	 if (sw_aliasstats->value) then
+	 	R_PrintAliasStats ()
+	 EndIf
+	 
+	 if (r_speeds->value) then
+	 	R_PrintTimes () 
+	 EndIf
+	 
+	 if (r_dspeeds->value) then
+	  R_PrintDSpeeds ()
+	 EndIf
+ 
+
+	 if (sw_reportsurfout->value and r_outofsurfaces) then
+	 	ri.Con_Printf (PRINT_ALL,!"Short %d surfaces\n", r_outofsurfaces)
+	 EndIf
+	 	 
+
+	 if (sw_reportedgeout->value and r_outofedges) then
+	 	ri.Con_Printf (PRINT_ALL,!"Short roughly %d edges\n", r_outofedges * 2 / 3)
+	 EndIf
+ 
+
+End Sub
 
 
 '/*
@@ -530,9 +1134,7 @@ sub R_InitGraphics(_width as integer , _height as integer )
 vid._width  = _width
 vid._height = _height
 
- 'd_pzbuffer = NULL
-'print @d_pzbuffer
-'sleep
+ 
 '// free z buffer
 if ( d_pzbuffer ) then
 	free( d_pzbuffer )
@@ -553,21 +1155,15 @@ EndIf
 R_InitCaches ()
 
  R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ) )
- 'print "PASSED!!!!!!!!!!!"
+ 
 End Sub
-
 
 'FINISHED FOR NOW'''''''''''''''''''''''''''''''''''''''''
 
 'extern declare sub Draw_BuildGammaTable()
 declare sub Draw_BuildGammaTable()
 sub R_BeginFrame(camera_separation as float )
-
-
-
-'printf("d_pzbuffer %i",sizeof(d_pzbuffer)) 
-
-
+ 
 
 '/*
 '** rebuild the gamma correction palette if necessary
@@ -594,14 +1190,7 @@ dim as rserr_t _err
 
 _err = SWimp_SetMode(@vid._width,@vid._height,sw_mode->value,vid_fullscreen->value)
 
-'print vid._width
-'print vid._height
-'print _err
-'print sw_mode->value
-'print rserr_ok 
-'
-'sleep
-
+ 
 
 if (  _err = rserr_ok ) then
 
@@ -635,30 +1224,109 @@ end if
 end if
 wend
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 End Sub
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
+'/*
+'** R_GammaCorrectAndSetPalette
+'*/
+sub R_GammaCorrectAndSetPalette( _palette as const ubyte ptr)
+	dim as integer i
 
-sub R_UnRegister ()
-	ri.Cmd_RemoveCommand( "screenshot" )
-	ri.Cmd_RemoveCommand ("modellist")
-	ri.Cmd_RemoveCommand( "imagelist" )
+	for  i = 0 to 256-1
+		sw_state.currentpalette(i*4+0) = sw_state.gammatable(_palette[i*4+0])
+		sw_state.currentpalette(i*4+1) = sw_state.gammatable(_palette[i*4+1])
+		sw_state.currentpalette(i*4+2) = sw_state.gammatable(_palette[i*4+2])
+
+	Next
+
+
+	 SWimp_SetPalette( @sw_state.currentpalette(0) )
+
+End Sub
+
+ 
+
+
+/'
+** R_CinematicSetPalette
+'/
+sub R_CinematicSetPalette( _palette as const zstring ptr  )
+	dim as ubyte palette32(1024) 
+	dim as integer			i, j, w 
+	dim as integer	ptr	d 
+
+	'// clear screen to black to avoid any palette flash
+	w = abs(vid.rowbytes) shr 2 	'// stupid negative pitch win32 stuff...
+ 
+	for i = 0 to vid._height - 1
+		
+		d = cast(integer ptr,  (vid.buffer + i*vid.rowbytes) ) 
+			for  j= 0 to w-1  
+				d[j] = 0
+	   	Next
+	
+			d+=w
+	next
+	'// flush it to the screen
+	SWimp_EndFrame () 
+
+	if ( _palette ) then
+	 
+		for  i = 0 to 256-1 
+					 
+			palette32(i*4+0) = _palette[i*3+0] 
+			palette32(i*4+1) = _palette[i*3+1] 
+			palette32(i*4+2) = _palette[i*3+2] 
+			palette32(i*4+3) = &HFF 
+		Next
+ 
+		'//R_GammaCorrectAndSetPalette( palette32 ) 
+	 
+	else
+	 
+		'//R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  d_8to24table))  
+	end if
+End Sub
+
+
+'/*
+'================
+'Draw_BuildGammaTable
+'================
+'*/
+sub Draw_BuildGammaTable ()
+
+
+
+	dim as integer		i, inf
+	dim as float	g
+
+	g = vid_gamma->value
+
+	if (g = 1.0) then
+
+		for i = 0 to 256-1
+			sw_state.gammatable(i) = i
+		next
+		return
+	end if
+
+	for i = 0 to 256-1
+		inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5
+		if (inf < 0) then
+			inf = 0
+		EndIf
+
+		if (inf > 255) then
+			inf = 255
+		EndIf
+
+		sw_state.gammatable(i) = inf
+							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  									Next
+
 End Sub
 
 
@@ -667,6 +1335,143 @@ End Sub
 
 
 
+/'
+** R_DrawBeam
+'/
+sub R_DrawBeam(e as entity_t ptr )
+	#define NUM_BEAM_SEGS 6
+	
+		dim as integer	i 
+
+	dim as vec3_t perpvec 
+	dim as vec3_t direction, normalized_direction  
+	dim as vec3_t start_points(NUM_BEAM_SEGS), end_points(NUM_BEAM_SEGS) 
+	dim as vec3_t oldorigin, origin 
+	
+	
+	if ( VectorNormalize( @normalized_direction ) = 0 ) then
+			return 
+	EndIf
+	
+	oldorigin.v(0) = e->oldorigin(0) 
+	oldorigin.v(1) = e->oldorigin(1) 
+	oldorigin.v(2) = e->oldorigin(2)
+	
+	direction.v(0) = oldorigin.v(0) - origin.v(0)
+	direction.v(1) = oldorigin.v(1) - origin.v(1) 
+	direction.v(2) = oldorigin.v(2) - origin.v(2) 
+	
+	
+	normalized_direction.v(0) = direction.v(0)  
+	normalized_direction.v(1) = direction.v(1)  
+	normalized_direction.v(2) = direction.v(2) 
+
+	if ( VectorNormalize( @normalized_direction ) = 0 ) then
+		return
+	EndIf
+	 
+
+	PerpendicularVector( @perpvec, @normalized_direction ) 
+	VectorScale(@perpvec, e->frame / 2, @perpvec ) 
+
+   for   i = 0 to NUM_BEAM_SEGS - 1 
+   	
+     _VectorAdd( @start_points(i), @origin, @start_points(i) ) 
+     _VectorAdd( @start_points(i), @direction, @end_points(i) ) 
+   Next
+ 
+ 		RotatePointAroundVector( @start_points(i), @normalized_direction,@ perpvec, (360.0/NUM_BEAM_SEGS)*i ) 
+
+ 
+ 
+ for   i = 0 to NUM_BEAM_SEGS - 1
+ 		R_IMFlatShadedQuad( @start_points(i), _
+		                    @end_points(i), _
+							@end_points((i+1) mod NUM_BEAM_SEGS), _
+							@start_points((i+1) mod NUM_BEAM_SEGS), _
+							e->skinnum and &HFF, _
+							e->alpha_ ) 
+
+ Next
+
+ 
+	
+	
+End Sub
+
+
+
+
+
+
+/'
+============
+R_SetSky
+============
+'/
+'// 3dstudio environment map names
+dim shared as zstring ptr suf(6) => {@"rt", @"bk", @"lf", @"ft", @"up", @"dn"}
+dim shared as integer	r_skysideimage(6) => {5, 2, 4, 1, 0, 3}
+extern	as mtexinfo_t		r_skytexinfo(6)
+sub R_setSky(_name as zstring ptr,rotate as float, axis as vec3_t ptr)
+	dim as integer		i 
+	dim as zstring * MAX_QPATH	pathname  
+
+	strncpy (skyname, _name, sizeof(skyname)-1) 
+	skyrotate = rotate 
+	_VectorCopy (axis, @skyaxis) 
+
+ 
+		
+	for i = 0 to 6-1
+		Com_sprintf (pathname, sizeof(pathname), "env/%s%s.pcx", skyname, suf(r_skysideimage(i)))
+		r_skytexinfo(i)._image = R_FindImage (pathname, it_sky)
+	Next
+	
+
+
+End Sub
+
+
+function Draw_GetPalette () as integer
+	dim as ubyte ptr 	 _out,  _pal
+	dim i  as integer
+	dim as integer 	r, g, b
+
+
+	LoadPCX ("pics/colormap.pcx", @vid.colormap, @_pal, NULL, NULL)
+	if (vid.colormap = NULL) then
+		'ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx")
+		print "Couldn't load pics/colormap.pcx"
+		return 0
+	EndIf
+	vid.alphamap = vid.colormap + 64*256
+
+	for i = 0 to 256-1
+
+		r = _pal[i*3+0]
+		g = _pal[i*3+1]
+		b = _pal[i*3+2]
+
+
+	Next
+
+
+
+	free (_pal)
+
+	return 0
+
+End Function
+
+ declare function R_RegisterSkin (_name as ZString) as image_s
+
+'/*
+'@@@@@@@@@@@@@@@@@@@@@
+'GetRefAPI
+'
+'@@@@@@@@@@@@@@@@@@@@@
+'*/
 
 extern "C"
 
@@ -717,60 +1522,10 @@ End Function
 end extern
 
 
-'/*
-'================
-'Draw_BuildGammaTable
-'================
-'*/
-sub Draw_BuildGammaTable ()
-
-
-
-	dim as integer		i, inf
-	dim as float	g
-
-	g = vid_gamma->value
-
-	if (g = 1.0) then
-
-		for i = 0 to 256-1
-			sw_state.gammatable(i) = i
-		next
-		return
-	end if
-
-	for i = 0 to 256-1
-		inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5
-		if (inf < 0) then
-			inf = 0
-		EndIf
-
-		if (inf > 255) then
-			inf = 255
-		EndIf
-
-		sw_state.gammatable(i) = inf
-							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  									Next
-
-End Sub
 #ifndef REF_HARD_LINKED
 
 
 
-'FINISHED
-sub Com_Printf CDecl (fmt as zstring ptr,...)
-	dim argptr as cva_list
-	
-	dim text as zstring * 1024
-	
-	 
-	 cva_start(argptr,fmt)
-	 vsprintf (text, fmt, argptr)
-	 cva_end(argptr)
-	 
-	 ri.Con_Printf (PRINT_ALL, "%s", text)
-	 
-End Sub
 
 
 '
@@ -790,9 +1545,23 @@ sub sys_error CDecl (_error as zstring ptr,...)
 	 
 End Sub
 
+'FINISHED
+sub Com_Printf CDecl (fmt as zstring ptr,...)
+	dim argptr as cva_list
+	
+	dim text as zstring * 1024
+	
+	 
+	 cva_start(argptr,fmt)
+	 vsprintf (text, fmt, argptr)
+	 cva_end(argptr)
+	 
+	 ri.Con_Printf (PRINT_ALL, "%s", text)
+	 
+End Sub
+
  #endif
 
+ 
 
-
-  
-'sleep 
+ 
