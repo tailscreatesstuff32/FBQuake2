@@ -913,7 +913,6 @@ declare sub  SWimp_LogNewFrame()
 declare sub R_IMFlatShadedQuad(  a as vec3_t ptr, b as vec3_t ptr,c as  vec3_t ptr ,d as vec3_t ptr , _color as  integer ,alpha_ as  float  ) 
  
 
-declare sub R_ClipAndDrawPoly ( alpha_ as float , isturbulent as integer , textured as qboolean )
 
 
 extern "C"

@@ -33,7 +33,8 @@ declare sub R_PolyChooseSpanletRoutine(alpha_ as float ,isturbulent as qboolean 
 
 extern as vec5_t r_clip_verts(2,MAXWORKINGVERTS+2)
 
- 'declare sub R_ClipAndDrawPoly( alpha_ as float ,isturbulent as qboolean ,textured  as qboolean )
+declare sub R_ClipAndDrawPoly ( alpha_ as float , isturbulent as integer , textured as qboolean )
+
 
  
 /'
