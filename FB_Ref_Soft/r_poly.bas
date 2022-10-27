@@ -1,13 +1,15 @@
 '#include <assert.h>
 #Include "FB_Ref_Soft\r_local.bi"
 
+ 
 
 static shared as integer r_polyblendcolor 
 
-dim shared as polydesc_t	r_polydesc 
+dim shared as polydesc_t	r_polydesc
+
 static shared as integer		clip_current 
 dim shared as vec5_t	r_clip_verts(2,MAXWORKINGVERTS+2) 
-
+ 
 
 
 sub R_DrawSpanletConstant33

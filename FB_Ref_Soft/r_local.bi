@@ -995,3 +995,9 @@ declare sub R_DrawSolidClippedSubmodelPolygons (pmodel as model_t ptr, topnode a
 declare sub R_AliasDrawModel ()
 '
 'declare sub R_RenderFrame (fd as refdef_t ptr)
+
+
+
+ extern as  vec5_t	r_clip_verts(2,MAXWORKINGVERTS+2) 
+
+ extern as polydesc_t  r_polydesc
