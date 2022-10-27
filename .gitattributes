@@ -1,3 +1,2 @@
-*.fbp linguist-detectable=false
-*.inc linguist-detectable=false
+*.inc linguist-language=Assembly
 *.bas linguist-language=FreeBasic
