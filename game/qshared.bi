@@ -1,6 +1,6 @@
 ''MIGHT BE INISHED FOR NOOW EXCEPT SOME ISSUES'''''''''''''''''''''''''''''''
 
-
+ '#include "windows.bi"
 
  #define id386	1
 
@@ -9,7 +9,7 @@
  'type edict_s as edict_s
   '''''''''''''''''''''''''''''''
 
-
+ 
 
 
 
@@ -37,6 +37,7 @@
 #include "crt.bi"
 
 
+type cplane_s as _cplane_s
 
 enum qboolean
    _false
@@ -95,31 +96,40 @@ End Enum
  
 
  'not sure'''''''''''''''''''''' 
-type  vec_t as float 
+type  vec_t as float
+' type  vec_tp as float ptr
+ 
+ 'type vec3_t
+ '	x as float
+ '	y as float
+ '	z as float
+ 'End Type
+
+ 'type vec3_t2
+	
+	'v(3) as float
+	
+ 'End Type
+ 
  type vec3_t
- 	x as float
- 	y as float
- 	z as float
+	
+	v(3) as float
+	
  End Type
+ 
+ type vec5_t
+	
+	v(5) as float
+	
+ End Type
+
+
 
 'type  vec3_t as vec_t        '[3] 
 'type  vec5_t  as vec_t       '[5] 
  '''''''''''''''''''''''''''''''
 'type vec3_t:v00 as float:v01 as float:v02 as float:End Type
 'type vec5_t:v00 as float:v01 as float:v02 as float:v03 as float:v04 as float:End Type
- 
-
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
 type 	fixed4_t as	integer
 type 	fixed8_t  as	integer
@@ -148,18 +158,28 @@ extern vec3_origin as vec3_t
  
  #if not(defined(C_ONLY)) and not(defined( __linux__)) and  not(defined(__sgi))
  ' see if i ts fine for now
-	extern "C"
-		declare  function Q_ftol(f as float  ) as long 
-	end extern
-
-	
-
+	'extern "C"
+		declare  function Q_ftol naked (f as float  ) as long 
+	'end extern
 	#else
 	 #define Q_ftol( f ) cast(long,f)
  #endif
  
 '#define DotProduct(x,y)			(x(0)*y(0)+x(1)*y(1)+x(2)*y(2))
-#define DotProduct(x,y)			(x.v00*y.v00+x.v01*y.v01+x.v02*y.v02)
+'#define DotProduct(x,y)			(x.v00*y.v00+x.v01*y.v01+x.v02*y.v02)
+'#define DotProduct(x,y)			(x[0]*y[0]+x[1]*y[1]+x[2]*y[2])
+'#define DotProduct(x1,y1)			(x1.x*y1(0,0)+x1.y*y1(1,0)+x1.z*y1(2,0))
+
+'#define DotProduct2(x1,y1)			(x1[0]*y1[0]+x1[1]*y1[1]+x1[2]*y1[2])
+'
+'#define DotProduct3(x1,y1)			(x1->v(0)*y1->v(0)+x1->v(1)*y1->v(1)+x1->v(2)*y1->v(2))
+
+
+
+'MIGHT WORK///////////////////////////////////////////////
+#define DotProduct(x,y)			(cast(float ptr, x)[0]*cast(float ptr, y)[0]+cast(float ptr, x)[1]*cast(float ptr, y)[1]+cast(float ptr, x)[0]*cast(float ptr, y)[2])
+'/////////////////////////////////////////////////////////
+
 #define VectorSubtract(a,b,c)	(c(0)=a(0)-b(0),c(1)=a(1)-b(1),c(2)=a(2)-b(2))
 #define VectorAdd(a,b,c)		(c(0)=a(0)+b(0),c(1)=a(1)+b(1),c(2)=a(2)+b(2))
 #define VectorCopy(a,b)			(b(0)=a(0),b(1)=a(1),b(2)=a(2))
@@ -167,43 +187,69 @@ extern vec3_origin as vec3_t
 #define VectorNegate(a,b)		(b(0)=-a(0),b(1)=-a(1),b(2)=-a(2))
 #define VectorSet(v, x, y, z)	(v(0)=(x), v(1)=(y), v(2)=(z))
  
-declare sub VectorMA (veca as vec3_t ,_scale as float , vecb as vec3_t , vecc  as vec3_t) 
+declare sub VectorMA (veca as vec3_t ptr ,_scale as float , vecb as vec3_t ptr, vecc  as vec3_t ptr) 
  
  
-declare function _DotProduct (v1 as vec3_t , v2 as vec3_t) As vec_t 
-declare sub   _VectorSubtract (veca as vec3_t , vecb as vec3_t , _out as vec3_t )
-declare sub    _VectorAdd (veca as vec3_t ,vecb as vec3_t ,_out as vec3_t )
-declare sub   _VectorCopy ( _in as vec3_t,  _out as vec3_t)
+declare function _DotProduct (v1 as vec3_t ptr, v2 as vec3_t ptr) As vec_t 
+declare sub   _VectorSubtract (veca as vec3_t ptr, vecb as vec3_t ptr, _out as vec3_t ptr)
+declare sub   _VectorAdd (veca as vec3_t ptr,vecb as vec3_t ptr,_out as vec3_t ptr)
+declare sub   _VectorCopy ( _in as vec3_t ptr,  _out as vec3_t ptr)
  
-declare sub   ClearBounds (mins as vec3_t , maxs as vec3_t)
-declare sub  AddPointToBounds (v as vec3_t , mins as  vec3_t, maxs as vec3_t)
-declare function VectorCompare (v1 as vec3_t,v2 as vec3_t ) as integer 
-declare function VectorLength (v as vec3_t ) as vec_t 
-declare sub CrossProduct ( v1 as vec3_t, v2 as vec3_t,cross as vec3_t ) 
-declare function VectorNormalize ( v() as vec3_t) as vec_t 
-declare function VectorNormalize2 (v as vec3_t ,_out as vec3_t ) as vec_t 
-declare sub VectorInverse ( v as vec3_t) 
-declare sub VectorScale (_in() as vec3_t , _scale as  vec_t,_out() as vec3_t )
+declare sub   ClearBounds (mins as vec3_t ptr , maxs as vec3_t ptr)
+declare sub  AddPointToBounds (v as vec3_t ptr, mins as  vec3_t ptr , maxs as vec3_t ptr)
+declare function VectorCompare (v1 as vec3_t ptr ,v2 as vec3_t ptr) as integer 
+declare function VectorLength (_v as vec3_t ptr) as vec_t 
+declare sub CrossProduct ( v1 as vec3_t ptr, v2 as vec3_t ptr,cross as vec3_t ptr ) 
+declare function VectorNormalize ( _v  as vec3_t ptr) as vec_t 
+declare function VectorNormalize2 (_v as vec3_t ptr ,_out as vec3_t  ptr ) as vec_t 
+declare sub VectorInverse ( _v as vec3_t ptr) 
+
+'declare sub VectorScale (_in() as vec3_t , _scale as  vec_t,_out() as vec3_t )
+declare sub VectorScale (_in  as vec3_t ptr , scale as  vec_t ,_out  as vec3_t ptr  )
+
 declare function Q_log2(_val as integer ) as integer 
 
+ 
 
-'not sure''''''''''''''''''''''''''''''''
-'declare sub  ConcatRotations (in1(3,3) as float,in2(3,3) as float,_out(3,3) as float) 
-'declare sub  R_ConcatTransforms (in1(3,4) as float,in2(3,4) as float,_out(3,4) as float)
-'''''''''''''''''''''''''''''''''''''''''
 
-declare sub  ConcatRotations (in1() as float,in2() as float,_out() as float) 
+
+'MIGHT WORK///////////////////////////////////////////
+ declare sub  R_ConcatRotations (in1()  as float,in2() as float,_out() as float)
 declare sub  R_ConcatTransforms (in1() as float,in2() as float,_out() as float)
+'/////////////////////////////////////////////////
 
 
-declare sub AngleVectors (angles as vec3_t ,forward as vec3_t ,_right as vec3_t ,_up as vec3_t) 
+
+
+
+ declare sub AngleVectors (angles as vec3_t ptr,forward as vec3_t ptr ,_right as vec3_t ptr ,_up as  vec3_t ptr) 
+ 'declare sub AngleVectors (angles as vec_tp , forward as vec_tp, _right as vec_tp ,up as vec_tp)
+ 	
+ 	
  
 'not sure''''''''''''''''''''''''''''''''
-'declare function BoxOnPlaneSide ( emins as vec3_t, emaxs as vec3_t, _plane as cplane_s ptr) as integer 
+ 'declare function BoxOnPlaneSide naked  ( emins as vec3_t, emaxs as vec3_t, _plane as cplane_s ptr) as integer 
 '''''''''''''''''''''''''''''''''''''''''
 'temp
-declare function BoxOnPlaneSide ( emins as vec3_t, emaxs as vec3_t, _plane as integer) as integer 
+ declare function BoxOnPlaneSide (emins as vec3_t ptr, emaxs as vec3_t ptr, p as cplane_s ptr) as integer 
 ''''''''''''''''''''''''''''''''''''''''''''''
+
+declare function _BOX_ON_PLANE_SIDE(emins as vec3_t ptr, emaxs as vec3_t ptr, p as cplane_s ptr) as integer
+#define BOX_ON_PLANE_SIDE(emins, emaxs, p) _
+			iif((p)->_type < 3,_
+					iif((p)->dist <= (emins)->v((p)->_type), _
+						1, _
+						iif( (p)->dist <= (emaxs)->v((p)->_type), _
+							2, _
+							3 _
+						) _	
+					), _		 
+	      BoxOnPlaneSide(emins,emaxs,p))
+					
+
+ 
+
+
 
 declare function anglemod(a as float ) as  float	
 declare function LerpAngle (a1 as float ,a2 as float ,_frac as float ) as float 
@@ -212,12 +258,24 @@ declare function LerpAngle (a1 as float ,a2 as float ,_frac as float ) as float
 'not sure if fixed
 
 '#define BOX_ON_PLANE_SIDE(emins, emaxs, p) (((p)->type < 3)?(((p)->dist <= (emins)[(p)->type])?1:(((p)->dist >= (emaxs)[(p)->type])?2:3)):BoxOnPlaneSide( (emins), (emaxs), (p)))
-#define BOX_ON_PLANE_SIDE(emins, emaxs, p) iif((p)->_type < 3,(iif((p)->dist <= (emins((p)->_type)),1,iif((p)->dist >= (emaxs((p)->_type)),2,3))),BoxOnPlaneSide( (emins), (emaxs), (p)))	
+'#define BOX_ON_PLANE_SIDE(emins, emaxs, p) iif((p)->_type < 3,(iif((p)->dist <= ((emins)->v(((p)->_type)),1,iif((p)->dist >= ((emaxs)->v((p)->_type)),2,3))),BoxOnPlaneSide( (emins), (emaxs), (p)))	
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-declare sub ProjectPointOnPlane( dst() as vec3_t , p() as  const  vec3_t, _normal() as const  vec3_t ) 
-declare sub PerpendicularVector( dst() as vec3_t ,src() as  const  vec3_t) 
-declare sub RotatePointAroundVector( dst() as vec3_t, _dir() as vec3_t,  _point() as const vec3_t, degrees as float) 
+'declare sub ProjectPointOnPlane( dst() as vec3_t , p() as  const  vec3_t, _normal() as const  vec3_t ) 
+'declare sub ProjectPointOnPlane( dst as vec_tp , p as const vec_tp , normal as const vec_tp  )
+declare sub ProjectPointOnPlane( dst as vec3_t ptr, p as const vec3_t ptr, normal as const vec3_t ptr )
+
+
+
+'declare sub PerpendicularVector( dst() as vec3_t ,src() as  const  vec3_t) 
+declare sub PerpendicularVector( dst as vec3_t ptr,src as  const  vec3_t ptr) 
+
+'declare sub RotatePointAroundVector( dst() as vec3_t, _dir() as vec3_t,  _point() as const vec3_t, degrees as float) 
+'declare sub RotatePointAroundVector( dst  as vec_tp, _dir  as vec_tp,  _point  as const vec_tp, degrees as float) 
+
+declare sub RotatePointAroundVector( dst  as vec3_t ptr, _dir  as vec3_t ptr,  _point  as const vec3_t ptr, degrees as float) 
+
+
 
 declare function  COM_SkipPath (pathname as zstring ptr)  as ZString ptr
 declare sub StripExtension (_in  as zstring ptr, _out as zstring ptr) 
@@ -284,7 +342,7 @@ declare function Sys_FindFirst (_path as zstring ptr, musthave as UInteger,canth
 declare function cSys_FindNext ( musthave as UInteger,canthave as  uinteger  ) as zstring ptr
 declare sub Sys_FindClose () 
  
-'declare sub Com_Printf CDecl (fmt as zstring ptr,...)
+ 'declare sub Com_Printf CDecl (fmt as zstring ptr,...)
 'declare sub sys_error CDecl (_error as zstring ptr,...)
  
  
@@ -393,7 +451,7 @@ end type:type cvar_t as cvar_s
  
  
 
-  type cplane_s
+  type _cplane_s
   _normal as vec3_t
 	dist as float
 	_type as ubyte
