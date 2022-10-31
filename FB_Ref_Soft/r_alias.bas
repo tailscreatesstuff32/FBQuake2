@@ -617,6 +617,8 @@ end sub
 #endif
 
 
-
+sub R_AliasProjectAndClipTestFinalVert( fv as finalvert_t ptr  )
+	
+End Sub
 
 

@@ -20,8 +20,8 @@ dim shared as zstring ptr loadname(32) 	'// for hunk tags
 
 'void Mod_LoadSpriteModel (model_t *mod, void *buffer);
 'void Mod_LoadBrushModel (model_t *mod, void *buffer);
-'void Mod_LoadAliasModel (model_t *mod, void *buffer);
-'model_t *Mod_LoadModel (model_t *mod, qboolean crash);
+declare sub Mod_LoadAliasModel (_mod as model_t ptr,buffer as any ptr) 
+ 'model_t *Mod_LoadModel (model_t *mod, qboolean crash) 
 
 dim shared as ubyte 	mod_novis(MAX_MAP_LEAFS/8)
 
@@ -39,7 +39,575 @@ dim shared	as Integer		modfilelen
 
 
 
-sub  Mod_LoadAliasModel (_mod as model_t ptr ,buffer as  any ptr)
+
+
+/'
+=================
+Mod_SetParent
+=================
+'/
+sub Mod_SetParent (node as mnode_t ptr,parent as  mnode_t ptr)
+ 
+	node->parent = parent 
+	if (node->contents <> -1) then
+		return
+	EndIf
+	 
+	Mod_SetParent (node->children(0), node) 
+end sub
+
+
+
+'//===============================================================================
+
+
+'/*
+'=================
+'Mod_LoadSpriteModel
+'=================
+'*/
+sub Mod_LoadSpriteModel (_mod as model_t ptr, buffer as any ptr)
+ 
+	dim as dsprite_t ptr	 sprin, sprout 
+	dim as  integer			i 
+
+	sprin = cast(dsprite_t ptr,buffer) 
+	sprout = Hunk_Alloc (modfilelen) 
+
+	sprout->ident = LittleLong (sprin->ident) 
+	sprout->version = LittleLong (sprin->version) 
+	sprout->numframes = LittleLong (sprin->numframes) 
+
+	if (sprout->version <> SPRITE_VERSION) then
+		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)", _
+		 					_mod->_name, sprout->version, SPRITE_VERSION)
+	EndIf
+				
+
+	if (sprout->numframes > MAX_MD2SKINS) then
+		ri.Sys_Error (ERR_DROP, "%s has too many frames (%i > %i)")
+	end if	
+				_ mod->_name, sprout->numframes, MAX_MD2SKINS) 
+
+	'// byte swap everything
+	for  i=0 to sprout->numframes - 1 
+	 
+		sprout->frames(i)._width = LittleLong (sprin->frames(i)._width)
+		sprout->frames(i)._height = LittleLong (sprin->frames(i)._height)
+		sprout->frames(i).origin_x = LittleLong (sprin->frames(i).origin_x)
+		sprout->frames(i).origin_y = LittleLong (sprin->frames(i).origin_y)
+		memcpy (@sprout->frames(i)._name, @sprin->frames(i)._name, MAX_SKINNAME)
+		_mod->skins(i) = R_FindImage (sprout->frames(i)._name, it_sprite)
+	next
+
+	_mod->_type = mod_sprite 
+end sub
+
+'//=============================================================================
+
+
+
+ 
+function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
+	dim _mod as model_t	ptr
+	dim buf as UInteger ptr
+	dim i as integer 
+	
+	if (_name[0] = NULL) then
+ 		 ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name") 
+	end if
+	
+	
+	'//
+	'// inline models are grabbed only from worldmodel
+	'//
+	if (_name[0]  = "*") then
+		i = atoi(_name+1)
+			if (i < 1 or r_worldmodel = NULL or i >= r_worldmodel->numsubmodels) then
+			 	ri.Sys_Error (ERR_DROP, "bad inline model number") 
+			EndIf
+		return @mod_inline(i)
+	EndIf
+	 
+ 	'//
+	'// search the currently loaded models
+	'//
+	_mod = @mod_known(0) 
+	for  i = 0 to mod_numknown-1
+			if ( _mod->_name[0] = NULL) then
+			 continue for
+			 end if
+		if ( strcmp (_mod->_name, _name) = 0  ) then
+			return _mod 
+		EndIf
+		_mod+=1
+	Next
+		 
+ 	'//
+	'// find a free model slot spot
+	'//
+	_mod = @mod_known(0) 
+	for  i = 0 to mod_numknown-1
+		if (_mod->_name[0] = NULL) then
+			exit for
+			
+		EndIf
+			
+	Next
+	 
+	 
+	if (i  = mod_numknown) then
+		if (mod_numknown = MAX_MOD_KNOWN) then
+			
+			 ri.Sys_Error (ERR_DROP, "mod_numknown == MAX_MOD_KNOWN")
+		
+		EndIf
+	mod_numknown+=1
+ 
+	EndIf
+	
+	
+
+	strcpy (_mod->_name, _name) 
+	
+ 
+	
+	modfilelen = ri.FS_LoadFile (_mod->_name, @buf) 
+   	if ( buf = NULL) then
+    
+		if (crash) then
+			
+			 ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", _mod->_name) 
+			'printf(!"Mod_NumForName: %s not found", _mod->_name)
+		EndIf		
+		memset (@_mod->_name, 0, sizeof(_mod->_name)) 
+	 return NULL	
+	EndIf
+	
+	 loadmodel = _mod
+	
+	'
+   '//
+	'// fill it in
+	'//
+
+	
+		'// call the apropriate loader
+	 
+	
+	select case  LittleLong(*cast(uinteger ptr,  buf))
+	 
+		case IDALIASHEADER 
+			
+			   print
+   printf(!"\n")
+   printf(!"IDP2\n")
+   print("IDP2")
+	'printf("is_bsp")
+   'print("is_bsp")
+   print
+		   loadmodel->extradata = _Hunk_Begin(&H200000) 
+		   
+		   print "EXTRA DATA: " & loadmodel->extradata
+		   
+		  Mod_LoadAliasModel (_mod, buf) 
+		  
+		  
+		 ' print loadmodel->numvertexes 
+		 
+		 'sleep
+		 
+		 
+	 
+
+	case IDSPRITEHEADER 
+	    loadmodel->extradata = _Hunk_Begin (&H10000) 
+		 Mod_LoadSpriteModel (_mod, buf) 
+    print
+    printf(!"\n")
+   printf("IDS2")
+   'print("IDS2")
+	
+	case IDBSPHEADER 
+	 'loadmodel->extradata = _Hunk_Begin (&H1000000) 
+		'Mod_LoadBrushModel (_mod, buf) 
+	 'printf("is_bsp")
+   'print("is_bsp")
+   print
+   printf(!"\n")
+   printf("IBSP")
+   print("IBSP")
+	case else
+		 ri.Sys_Error (ERR_DROP,"Mod_NumForName: unknown fileid for %s", _mod->_name) 
+	 'printf( "Mod_NumForName: unknown fileid for %s") 
+	end select
+
+  loadmodel->extradatasize = _Hunk_End () 
+   
+	ri.FS_FreeFile (buf) 
+
+	return _mod 
+	
+	
+End Function
+  
+  
+  
+  
+  
+  
+  
+  
+  
+/'
+===================
+Mod_DecompressVis
+===================
+'/
+function Mod_DecompressVis (_in as ubyte ptr,model as model_t ptr )as ubyte ptr
+	
+End Function
+
+
+  
+'  /*
+'==============
+'Mod_ClusterPVS
+'==============
+'*/
+function Mod_ClusterPVS ( cluster as integer, model as model_t ptr) as ubyte ptr
+	
+		if (cluster =  -1 or  model->vis = null) then
+			return @mod_novis(0)
+		EndIf
+
+ 	return Mod_DecompressVis ( cast(ubyte ptr,model->vis) + model->vis->bitofs(cluster,DVIS_PVS), _
+	 	model) 
+End Function
+ 
+
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+'/*
+'================
+'Mod_Modellist_f
+'================
+'*/
+sub Mod_Modellist_f ()
+ 
+	dim i as integer		 
+	dim 	_mod  as model_t ptr
+	dim  total   as integer		
+
+	total = 0 
+	 ri.Con_Printf (PRINT_ALL,!"Loaded models:\n") 
+	'printf(!"Loaded models:\n") 
+	_mod=@mod_known(0)
+ 
+	 
+	
+	
+	for i=0 to mod_numknown-1
+		
+		if ( _mod->_name[0] = NULL) then
+			continue for
+		EndIf
+		
+				'ri.Con_Printf (PRINT_ALL, "%8i : %s\n",mod->extradatasize, mod->name) 
+		Printf (!"%8i : %s\n",_mod->extradatasize, _mod->_name)
+		total +=_mod->extradatasize 
+		_mod+=1	
+		
+		
+		
+	Next
+	 
+		'sleep
+
+ 'printf(!"Total resident: %i\n", total)
+ ri.Con_Printf (PRINT_ALL, !"Total resident: %i\n", total) 
+ 
+
+end sub
+
+
+
+
+ 
+
+
+
+
+ sub Mod_Init ()
+ 	memset (@mod_novis(0), &Hff, ubound(mod_novis))
+ end sub
+ 
+ 
+ 
+ 
+' /*
+'=================
+'Mod_LoadLeafs
+'=================
+'*/
+'void Mod_LoadLeafs (lump_t *l)
+'{'
+'	dleaf_t 	*in;'
+'	mleaf_t 	*out;
+'	int			i, j, count;
+'
+'	in = (void *)(mod_base + l->fileofs);
+'	if (l->filelen % sizeof(*in))
+'		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+'	count = l->filelen / sizeof(*in);
+'	out = Hunk_Alloc ( count*sizeof(*out));
+'
+'	loadmodel->leafs = out;
+'	loadmodel->numleafs = count;
+'
+'	for ( i=0 ; i<count ; i++, in++, out++)
+'	{
+'		for (j=0 ; j<3 ; j++)
+'		{
+'			out->minmaxs[j] = LittleShort (in->mins[j]);
+'			out->minmaxs[3+j] = LittleShort (in->maxs[j]);
+'		}
+'
+'		out->contents = LittleLong(in->contents);
+'		out->cluster = LittleShort(in->cluster);
+'		out->area = LittleShort(in->area);
+'
+'		out->firstmarksurface = loadmodel->marksurfaces +
+'			LittleShort(in->firstleafface);
+'		out->nummarksurfaces = LittleShort(in->numleaffaces);
+'	}	
+'}
+'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'/*
+'=================
+'Mod_LoadMarksurfaces
+'=================
+'*/
+
+sub Mod_LoadMarksurfaces (l as lump_t ptr)
+	'{	'
+	'int		i, j, count;'
+	'short		*in;
+'	msurface_t **out;
+'	
+'	in = (void *)(mod_base + l->fileofs);
+'	if (l->filelen % sizeof(*in))
+'		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+'	count = l->filelen / sizeof(*in);
+'	out = Hunk_Alloc ( count*sizeof(*out));	
+'
+'	loadmodel->marksurfaces = out;
+'	loadmodel->nummarksurfaces = count;
+'
+'	for ( i=0 ; i<count ; i++)
+'	{
+'		j = LittleShort(in[i]);
+'		if (j >= loadmodel->numsurfaces)
+'			ri.Sys_Error (ERR_DROP,"Mod_ParseMarksurfaces: bad surface number");
+'		out[i] = loadmodel->surfaces + j;
+'	}
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+' /*
+'=================
+'Mod_LoadSurfedges
+'=================
+'*/
+'void Mod_LoadSurfedges (lump_t *l)
+'{	'
+	'int		i, count;'
+	'int		*in, *out;
+'	
+'	in = (void *)(mod_base + l->fileofs);
+'	if (l->filelen % sizeof(*in))
+'		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+'	count = l->filelen / sizeof(*in);
+'	out = Hunk_Alloc ( (count+24)*sizeof(*out));	// extra for skybox
+'
+'	loadmodel->surfedges = out;
+'	loadmodel->numsurfedges = count;
+'
+'	for ( i=0 ; i<count ; i++)
+'		out[i] = LittleLong (in[i]);
+'}
+'
+'/*
+'=================
+'Mod_LoadPlanes
+'=================
+'*/
+'void Mod_LoadPlanes (lump_t *l)
+'{'
+'	int			i, j;'
+'	mplane_t	*out;
+'	dplane_t 	*in;
+'	int			count;
+'	int			bits;
+'	
+'	in = (void *)(mod_base + l->fileofs);
+'	if (l->filelen % sizeof(*in))
+'		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+'	count = l->filelen / sizeof(*in);
+'	out = Hunk_Alloc ( (count+6)*sizeof(*out));		// extra for skybox
+'	
+'	loadmodel->planes = out;
+'	loadmodel->numplanes = count;
+'
+'	for ( i=0 ; i<count ; i++, in++, out++)
+'	{
+'		bits = 0;
+'		for (j=0 ; j<3 ; j++)
+'		{
+'			out->normal[j] = LittleFloat (in->normal[j]);
+'			if (out->normal[j] < 0)
+'				bits |= 1<<j;
+'		}
+'
+'		out->dist = LittleFloat (in->dist);
+'		out->type = LittleLong (in->type);
+'		out->signbits = bits;
+'	}
+'}
+ 
+' /*
+'=================
+'Mod_LoadBrushModel
+'=================
+'*/
+'void Mod_LoadBrushModel (model_t *mod, void *buffer)
+'{'
+	'int			i;'
+	'dheader_t	*header;
+'	dmodel_t 	*bm;
+'	
+'	loadmodel->type = mod_brush;
+'	if (loadmodel != mod_known)
+'		ri.Sys_Error (ERR_DROP, "Loaded a brush model after the world");
+'	
+'	header = (dheader_t *)buffer;
+'
+'	i = LittleLong (header->version);
+'	if (i != BSPVERSION)
+'		ri.Sys_Error (ERR_DROP,"Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
+'
+'// swap all the lumps
+'	mod_base = (byte *)header;
+'
+'	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
+'		((int *)header)[i] = LittleLong ( ((int *)header)[i]);
+'
+'// load into heap
+'	
+'	Mod_LoadVertexes (&header->lumps[LUMP_VERTEXES]);
+'	Mod_LoadEdges (&header->lumps[LUMP_EDGES]);
+'	Mod_LoadSurfedges (&header->lumps[LUMP_SURFEDGES]);
+'	Mod_LoadLighting (&header->lumps[LUMP_LIGHTING]);
+'	Mod_LoadPlanes (&header->lumps[LUMP_PLANES]);
+'	Mod_LoadTexinfo (&header->lumps[LUMP_TEXINFO]);
+'	Mod_LoadFaces (&header->lumps[LUMP_FACES]);
+'	Mod_LoadMarksurfaces (&header->lumps[LUMP_LEAFFACES]);
+'	Mod_LoadVisibility (&header->lumps[LUMP_VISIBILITY]);
+'	Mod_LoadLeafs (&header->lumps[LUMP_LEAFS]);
+'	Mod_LoadNodes (&header->lumps[LUMP_NODES]);
+'	Mod_LoadSubmodels (&header->lumps[LUMP_MODELS]);
+'	r_numvisleafs = 0;
+'	R_NumberLeafs (loadmodel->nodes);
+'	
+'//
+'// set up the submodels
+'//
+'	for (i=0 ; i<mod->numsubmodels ; i++)
+'	{
+'		model_t	*starmod;
+'
+'		bm = &mod->submodels[i];
+'		starmod = &mod_inline[i];
+'
+'		*starmod = *loadmodel;
+'		
+'		starmod->firstmodelsurface = bm->firstface;
+'		starmod->nummodelsurfaces = bm->numfaces;
+'		starmod->firstnode = bm->headnode;
+'		if (starmod->firstnode >= loadmodel->numnodes)
+'			ri.Sys_Error (ERR_DROP, "Inline model %i has bad firstnode", i);
+'
+'		VectorCopy (bm->maxs, starmod->maxs);
+'		VectorCopy (bm->mins, starmod->mins);
+'	
+'		if (i == 0)
+'			*loadmodel = *starmod;
+'	}
+'
+'	R_InitSkyBox ();
+'}
+' 
+'/*
+'==============================================================================
+'
+'ALIAS MODELS
+'
+'==============================================================================
+'*/
+'
+'/*
+'=================
+'Mod_LoadAliasModel
+'====== 
+ sub  Mod_LoadAliasModel (_mod as model_t ptr ,buffer as  any ptr)
  
    dim as integer					i, j 
    dim as dmdl_t ptr	 pinmodel,  pheader 
@@ -299,250 +867,75 @@ end sub
 
 
 
-
-
-
-
-
-
-
-
-'//===============================================================================
-
-
+'/*
+'==============================================================================
+'
+'SPRITE MODELS
+'
+'==============================================================================
+'*/
+'
 '/*
 '=================
 'Mod_LoadSpriteModel
 '=================
 '*/
-sub Mod_LoadSpriteModel (_mod as model_t ptr, buffer as any ptr)
- 
-	dim as dsprite_t ptr	 sprin, sprout 
-	dim as  integer			i 
-
-	sprin = cast(dsprite_t ptr,buffer) 
-	sprout = Hunk_Alloc (modfilelen) 
-
-	sprout->ident = LittleLong (sprin->ident) 
-	sprout->version = LittleLong (sprin->version) 
-	sprout->numframes = LittleLong (sprin->numframes) 
-
-	if (sprout->version <> SPRITE_VERSION) then
-		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)", _
-		 					_mod->_name, sprout->version, SPRITE_VERSION)
-	EndIf
-				
-
-	if (sprout->numframes > MAX_MD2SKINS) then
-		ri.Sys_Error (ERR_DROP, "%s has too many frames (%i > %i)")
-	end if	
-				_ mod->_name, sprout->numframes, MAX_MD2SKINS) 
-
-	'// byte swap everything
-	for  i=0 to sprout->numframes - 1 
-	 
-		sprout->frames(i)._width = LittleLong (sprin->frames(i)._width)
-		sprout->frames(i)._height = LittleLong (sprin->frames(i)._height)
-		sprout->frames(i).origin_x = LittleLong (sprin->frames(i).origin_x)
-		sprout->frames(i).origin_y = LittleLong (sprin->frames(i).origin_y)
-		memcpy (@sprout->frames(i)._name, @sprin->frames(i)._name, MAX_SKINNAME)
-		_mod->skins(i) = R_FindImage (sprout->frames(i)._name, it_sprite)
-	next
-
-	_mod->_type = mod_sprite 
-end sub
-
+'void Mod_LoadSpriteModel (model_t *mod, void *buffer)
+'{'
+	'dsprite_t	*sprin, *sprout;'
+	'int			i;
+'
+'	sprin = (dsprite_t *)buffer;
+'	sprout = Hunk_Alloc (modfilelen);
+'
+'	sprout->ident = LittleLong (sprin->ident);
+'	sprout->version = LittleLong (sprin->version);
+'	sprout->numframes = LittleLong (sprin->numframes);
+'
+'	if (sprout->version != SPRITE_VERSION)
+'		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
+'				 mod->name, sprout->version, SPRITE_VERSION);
+'
+'	if (sprout->numframes > MAX_MD2SKINS)
+'		ri.Sys_Error (ERR_DROP, "%s has too many frames (%i > %i)",
+'				 mod->name, sprout->numframes, MAX_MD2SKINS);
+'
+'	// byte swap everything
+'	for (i=0 ; i<sprout->numframes ; i++)
+'	{
+'		sprout->frames[i].width = LittleLong (sprin->frames[i].width);
+'		sprout->frames[i].height = LittleLong (sprin->frames[i].height);
+'		sprout->frames[i].origin_x = LittleLong (sprin->frames[i].origin_x);
+'		sprout->frames[i].origin_y = LittleLong (sprin->frames[i].origin_y);
+'		memcpy (sprout->frames[i].name, sprin->frames[i].name, MAX_SKINNAME);
+'		mod->skins[i] = R_FindImage (sprout->frames[i].name, it_sprite);
+'	}
+'
+'	mod->type = mod_sprite;
+'}
+'
 '//=============================================================================
-
-
-
  
-function Mod_ForName (_name as zstring ptr,crash as qboolean ) as model_t ptr
-	dim _mod as model_t	ptr
-	dim buf as UInteger ptr
-	dim i as integer 
-	
-	if (_name[0] = NULL) then
- 		 ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name") 
-	end if
-	
-	
-	'//
-	'// inline models are grabbed only from worldmodel
-	'//
-	if (_name[0]  = "*") then
-		i = atoi(_name+1)
-			if (i < 1 or r_worldmodel = NULL or i >= r_worldmodel->numsubmodels) then
-			 	ri.Sys_Error (ERR_DROP, "bad inline model number") 
-			EndIf
-		return @mod_inline(i)
-	EndIf
-	 
- 	'//
-	'// search the currently loaded models
-	'//
-	_mod = @mod_known(0) 
-	for  i = 0 to mod_numknown-1
-			if ( _mod->_name[0] = NULL) then
-			 continue for
-			 end if
-		if ( strcmp (_mod->_name, _name) = 0  ) then
-			return _mod 
-		EndIf
-		_mod+=1
-	Next
-		 
- 	'//
-	'// find a free model slot spot
-	'//
-	_mod = @mod_known(0) 
-	for  i = 0 to mod_numknown-1
-		if (_mod->_name[0] = NULL) then
-			exit for
-			
-		EndIf
-			
-	Next
-	 
-	 
-	if (i  = mod_numknown) then
-		if (mod_numknown = MAX_MOD_KNOWN) then
-			
-			 ri.Sys_Error (ERR_DROP, "mod_numknown == MAX_MOD_KNOWN")
-		
-		EndIf
-	mod_numknown+=1
  
-	EndIf
-	
-	
-
-	strcpy (_mod->_name, _name) 
-	
  
+ 
+ 
+   sub R_BeginRegistration (model as ZString ptr)
+	  dim fullname as zstring * MAX_QPATH 
+	 	 dim flushmap as cvar_t	ptr
+	 	 registration_sequence+=1
+	 	 r_oldviewcluster = -1 
+	'	 Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model) 
+	       flushmap = ri.Cvar_Get ("flushmap", "0", 0)
+	 	  ' or flushmap->value
+	 if ( strcmp(mod_known(0)._name, fullname) ) then
+	 	Mod_Free (@mod_known(0))
+	 EndIf
+ 	 r_worldmodel = Mod_ForName(fullname, _true)
+	 	 r_viewcluster = -1
 	
-	modfilelen = ri.FS_LoadFile (_mod->_name, @buf) 
-   	if ( buf = NULL) then
-    
-		if (crash) then
-			
-			 ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", _mod->_name) 
-			'printf(!"Mod_NumForName: %s not found", _mod->_name)
-		EndIf		
-		memset (@_mod->_name, 0, sizeof(_mod->_name)) 
-	 return NULL	
-	EndIf
-	
-	 loadmodel = _mod
-	
-	'
-   '//
-	'// fill it in
-	'//
-
-	
-		'// call the apropriate loader
-	 
-	
-	select case  LittleLong(*cast(uinteger ptr,  buf))
-	 
-		case IDALIASHEADER 
-			
-			   print
-   printf(!"\n")
-   printf(!"IDP2\n")
-   print("IDP2")
-	'printf("is_bsp")
-   'print("is_bsp")
-   print
-		   loadmodel->extradata = _Hunk_Begin(&H200000) 
-		   
-		   print "EXTRA DATA: " & loadmodel->extradata
-		   
-		  Mod_LoadAliasModel (_mod, buf) 
-		  
-		  
-		 ' print loadmodel->numvertexes 
-		 
-		 'sleep
-		 
-		 
-	 
-
-	case IDSPRITEHEADER 
-	    loadmodel->extradata = _Hunk_Begin (&H10000) 
-		 Mod_LoadSpriteModel (_mod, buf) 
-    print
-    printf(!"\n")
-   printf("IDS2")
-   'print("IDS2")
-	
-	case IDBSPHEADER 
-	 'loadmodel->extradata = _Hunk_Begin (&H1000000) 
-		'Mod_LoadBrushModel (_mod, buf) 
-	 'printf("is_bsp")
-   'print("is_bsp")
-   print
-   printf(!"\n")
-   printf("IBSP")
-   print("IBSP")
-	case else
-		 ri.Sys_Error (ERR_DROP,"Mod_NumForName: unknown fileid for %s", _mod->_name) 
-	 'printf( "Mod_NumForName: unknown fileid for %s") 
-	end select
-
-  loadmodel->extradatasize = _Hunk_End () 
+   End Sub
    
-	ri.FS_FreeFile (buf) 
-
-	return _mod 
-	
-	
-End Function
-  
-  
-  
-  
-  
-  
-  
-  
-  
-/'
-===================
-Mod_DecompressVis
-===================
-'/
-function Mod_DecompressVis (_in as ubyte ptr,model as model_t ptr )as ubyte ptr
-	
-End Function
-
-
-  
-'  /*
-'==============
-'Mod_ClusterPVS
-'==============
-'*/
-function Mod_ClusterPVS ( cluster as integer, model as model_t ptr) as ubyte ptr
-	
-		if (cluster =  -1 or  model->vis = null) then
-			return @mod_novis(0)
-		EndIf
-
- 	return Mod_DecompressVis ( cast(ubyte ptr,model->vis) + model->vis->bitofs(cluster,DVIS_PVS), _
-	 	model) 
-End Function
- 
-
-  
-  
-  
-  
-  
-  
-  
-  
 function R_RegisterModel (_name as ZString ptr) as model_s ptr
  
  	dim _mod  as model_t	ptr
@@ -589,66 +982,31 @@ function R_RegisterModel (_name as ZString ptr) as model_s ptr
  
 end function
 
+ 
+sub	R_EndRegistration ()
+	'
+	'	int		i;
+	'model_t	*mod;
 
+	'for (i=0, mod=mod_known ; i<mod_numknown ; i++, mod++)
+	'{
+'		if (!mod->name[0])
+	'		continue;
+	'	if (mod->registration_sequence != registration_sequence)
+	'	{	// don't need this model
+	'		Hunk_Free (mod->extradata);
+	'		memset (mod, 0, sizeof(*mod));
+	'	}
+	'	else
+	'	{	// make sure it is paged in
+	'		Com_PageInMemory (mod->extradata, mod->extradatasize);
+	'	}
+	'}
 
-
-
-sub R_BeginRegistration (model as ZString ptr)
-	  dim fullname as zstring * MAX_QPATH 
-	 	 dim flushmap as cvar_t	ptr
-	 	 registration_sequence+=1
-	 	 r_oldviewcluster = -1 
-	'	 Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model) 
-	       flushmap = ri.Cvar_Get ("flushmap", "0", 0)
-	 	  ' or flushmap->value
-	 if ( strcmp(mod_known(0)._name, fullname) ) then
-	 	Mod_Free (@mod_known(0))
-	 EndIf
- 	 r_worldmodel = Mod_ForName(fullname, _true)
-	 	 r_viewcluster = -1
-	
+	'R_FreeUnusedImages ();
 End Sub
-'/*
-'================
-'Mod_Modellist_f
-'================
-'*/
-sub Mod_Modellist_f ()
- 
-	dim i as integer		 
-	dim 	_mod  as model_t ptr
-	dim  total   as integer		
 
-	total = 0 
-	 ri.Con_Printf (PRINT_ALL,!"Loaded models:\n") 
-	'printf(!"Loaded models:\n") 
-	_mod=@mod_known(0)
- 
-	 
-	
-	
-	for i=0 to mod_numknown-1
-		
-		if ( _mod->_name[0] = NULL) then
-			continue for
-		EndIf
-		
-				'ri.Con_Printf (PRINT_ALL, "%8i : %s\n",mod->extradatasize, mod->name) 
-		Printf (!"%8i : %s\n",_mod->extradatasize, _mod->_name)
-		total +=_mod->extradatasize 
-		_mod+=1	
-		
-		
-		
-	Next
-	 
-		'sleep
 
- 'printf(!"Total resident: %i\n", total)
- ri.Con_Printf (PRINT_ALL, !"Total resident: %i\n", total) 
- 
-
-end sub
 
 
 
@@ -662,7 +1020,6 @@ sub  Mod_Free (_mod as model_t ptr )
  end if
 
 End Sub
- 
 
 
 
@@ -681,12 +1038,4 @@ sub Mod_FreeAll()
 		
 	Next
  
-End Sub
- sub Mod_Init ()
- 	memset (@mod_novis(0), &Hff, ubound(mod_novis))
- end sub
- 
-sub	R_EndRegistration ()
-	
-	
 End Sub

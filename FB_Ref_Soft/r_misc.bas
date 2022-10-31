@@ -5,6 +5,10 @@
 dim shared as cvar_t	ptr sw_mipcap
 dim shared as cvar_t	ptr sw_mipscale 
 
+dim shared as surfcache_t		ptr d_initial_rover 
+dim shared as qboolean		d_roverwrapped 
+dim shared as integer	   d_minmip 
+dim shared as float			d_scalemip(NUM_MIPS-1)
 
 extern "C"
 extern alias_colormap as zstring ptr 
@@ -148,3 +152,81 @@ sub R_SurfacePatch ()
 End Sub
  
 #endif	'// !id386
+
+sub R_ScreenShot_f()
+	
+	
+	
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+''sub	GL_ImageList_f ()
+'	'dim i  as integer		
+'	'dim _image as	image_t	ptr  
+'	'dim texels  as integer		
+'	'dim  palstrings(2) as const zstring ptr => _
+'	'{ _
+''		@"RGB", _
+'	'	@"PAL" _
+'	'} 
+'	'
+'		'ri.Con_Printf (PRINT_ALL, "------------------\n") 
+''	texels = 0 
+'
+'	
+'	'for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
+' 
+'   ' for i = 0 to numgltextures-1
+'   ' 	
+'   ' 	
+' 
+'   '  
+'	'	if (_image->texnum <= 0) then
+'	'		continue for
+'	'	end if	
+'	'		
+'	'	texels += _image->upload_width*_image->upload_height 
+'	'	select case (_image->_type)
+'	'				case it_skin 
+'	'		'ri.Con_Printf (PRINT_ALL, "M") 
+'	'	 
+'	'	case it_sprite 
+'	'		'ri.Con_Printf (PRINT_ALL, "S") 
+'	'	 
+'	'	case it_wall 
+'	'		'ri.Con_Printf (PRINT_ALL, "W") 
+'	'		 
+'	'	case it_pic 
+'	'		'ri.Con_Printf (PRINT_ALL, "P") 
+'	'	 
+'	'	default:
+'	'		'ri.Con_Printf (PRINT_ALL, " ") 
+'	'	 
+'	'		
+'	'		
+'	'	End Select
+'	' 'ri.Con_Printf (PRINT_ALL,  " %3i %3i %s: %s\n", _
+'	''		_image->upload_width, _image->upload_height, palstrings(_image->paletted), _image->_name)
+'	'
+'	'_image+=1
+'   ' next
+'	' 
+'
+'		 
+'	 
+'	'ri.Con_Printf (PRINT_ALL, "Total texel count (not counting mipmaps): %i\n", texels) 
+'	
+'	
+'	 
+'	 
+'	
+'End Sub

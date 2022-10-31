@@ -1,3 +1,6 @@
+'FINISHED FOR NOW//////////////////////////////////////////////////
+
+
 #Include "FB_Ref_Soft\r_local.bi"
 
 dim shared as vec3_t r_pright, r_pup, r_ppn 
@@ -56,9 +59,62 @@ static shared as ulong s_prefetch_address
 ** none
 '/
 
+extern "c"
+ extern as uinteger fpu_sp24_cw, fpu_chop_cw
+end extern
+
+ 
 
 sub R_DrawParticles ()
-	
+ 	 dim as particle_t ptr p 
+ 	dim as integer         i 
+ 
+ 	VectorScale( @vright, xscaleshrink, @r_pright ) 
+ 	VectorScale( @vup, yscaleshrink, @r_pup ) 
+ 	_VectorCopy( @vpn, @r_ppn ) 
+'
+ #if id386 '&& !defined __linux__
+   asm
+   	fldcw word ptr [fpu_sp24_cw]
+   End Asm 
+
+ #endif
+ 
+ 
+ p = r_newrefdef.particles
+ for i=0 to r_newrefdef.num_particles
+ 
+ 		if ( p->alpha_ > 0.66 ) then
+ 		
+ 			partparms.level = PARTICLE_OPAQUE 
+ 			
+ 		elseif ( p->alpha_ > 0.33 ) then
+ 			partparms.level = PARTICLE_66 
+ 		else
+ 			partparms.level = PARTICLE_33 
+ 		end if
+ 
+ 		partparms.particle = p 
+ 		partparms._color    = p->_color 
+ 
+ #if id386 '&& !defined __linux__
+ 		if ( i < r_newrefdef.num_particles-1 ) then
+ 			s_prefetch_address = cast(uinteger , p + 1 ) 
+ 		else
+ 			s_prefetch_address = cast( uinteger , r_newrefdef.particles )
+ 		end if
+#endif
+'
+ 		R_DrawParticle() 
+ 		p+=1
+ next
+ 
+ #if id386 '&& !defined __linux__
+ asm
+ 		 fldcw word ptr [fpu_chop_cw]
+ End Asm
+ 
+ #endif
 End Sub
 
 sub BlendParticle33 naked ()

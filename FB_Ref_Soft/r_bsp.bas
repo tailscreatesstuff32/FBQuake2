@@ -81,7 +81,7 @@ sub R_RotateBmodel ()
 '//
 '// rotate modelorg and the transformation matrix
 '//
-	'R_EntityRotate (modelorg) 
+	'R_EntityRotate(modelorg) 
 	'R_EntityRotate (vpn) 
 	'R_EntityRotate (vright) 
 	'R_EntityRotate (vup) 

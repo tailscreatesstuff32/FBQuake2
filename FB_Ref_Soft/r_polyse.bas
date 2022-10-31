@@ -605,7 +605,11 @@ end sub
 'R_PolysetCalcGradients
 '================
 '*/
+
+extern "C"
 extern as uinteger fpu_sp24_ceil_cw, fpu_ceil_cw, fpu_chop_cw 
+end extern
+
 
 '#if id386 && !defined __linux__
 
