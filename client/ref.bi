@@ -71,8 +71,8 @@ end type: type entity_t as entity_s
 
 
 type dlight_t
-	origin(3) as vec3_t
-	_color(3) as vec3_t	 
+	origin  as vec3_t
+	_color as vec3_t	 
 	intensity as float
 
 End Type
