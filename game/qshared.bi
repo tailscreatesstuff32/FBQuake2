@@ -177,7 +177,9 @@ extern vec3_origin as vec3_t
 
 
 'MIGHT WORK///////////////////////////////////////////////
-#define DotProduct(x,y)			(cast(float ptr, x)[0]*cast(float ptr, y)[0]+cast(float ptr, x)[1]*cast(float ptr, y)[1]+cast(float ptr, x)[0]*cast(float ptr, y)[2])
+'#define DotProduct(x,y)			(cast(float ptr, x)[0]*cast(float ptr, y)[0]+cast(float ptr, x)[1]*cast(float ptr, y)[1]+cast(float ptr, x)[2]*cast(float ptr, y)[2])
+ #define DotProduct(x,y)			(cast(float ptr, x)[0]*cast(float ptr, y)[0]+cast(float ptr, x)[1]*cast(float ptr, y)[1]+cast(float ptr, x)[2]*cast(float ptr, y)[2])
+
 '/////////////////////////////////////////////////////////
 
 #define VectorSubtract(a,b,c)	(c(0)=a(0)-b(0),c(1)=a(1)-b(1),c(2)=a(2)-b(2))
