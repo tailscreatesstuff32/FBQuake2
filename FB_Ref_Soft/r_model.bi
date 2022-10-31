@@ -99,6 +99,7 @@ End Type
 
 type mtexinfo_s
 	vecs(2,4) as float
+	mipadjust as float
 	flags as integer		
 	numframes as  integer		
 	_image as image_t ptr	 

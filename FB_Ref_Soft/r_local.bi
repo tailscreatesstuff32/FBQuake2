@@ -108,7 +108,7 @@ End Enum
 
 '//===================================================================
 
-type pixel_t as zstring ptr
+type pixel_t as ubyte 
 
  
 
@@ -541,7 +541,7 @@ extern as integer								d_aspancount, d_countextrastep
 
 
 
-extern  as UInteger fpu_sp24_ceil_cw, fpu_ceil_cw, fpu_chop_cw
+extern  as UInteger fpu_sp24_ceil_cw, fpu_ceil_cw, fpu_chop_cw,fpu_sp24_cw
 end extern
 
 extern as integer              r_amodels_drawn 
@@ -590,16 +590,27 @@ extern as qboolean         d_roverwrapped
 extern as surfcache_t ptr       sc_rover 
 extern as surfcache_t ptr       d_initial_rover 
 
+extern "C"
 extern as float    d_sdivzstepu, d_tdivzstepu, d_zistepu 
 extern as float    d_sdivzstepv, d_tdivzstepv, d_zistepv 
 extern as float    d_sdivzorigin, d_tdivzorigin, d_ziorigin 
 
+end extern
+
+
+
+
+extern "C"
 extern as  fixed16_t       sadjust, tadjust 
 extern as fixed16_t       bbextents, bbextentt 
 
 
+
 declare sub D_DrawSpans16 (pspans as espan_t ptr)
+
 declare sub D_DrawZSpans (pspans as espan_t ptr)
+end extern
+
 declare sub Turbulent8 (pspan as espan_t ptr)
 declare sub NonTurbulent8 (pspan as espan_t ptr)	'//PGM
 
@@ -607,7 +618,7 @@ declare function D_CacheSurface (surface as msurface_t ptr, miplevel as integer 
 
 extern as integer      d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle 
 
-extern "c"
+ extern "c"
 extern as integer      d_pix_min, d_pix_max, d_pix_shift 
 
 
@@ -629,7 +640,7 @@ extern as integer              d_minmip
 extern as float    d_scalemip(3) 
 
 '//===================================================================
-extern "c"
+ extern "c"
 extern as integer              cachewidth 
 extern as pixel_t  ptr            cacheblock 
 extern as integer              r_screenwidth 
@@ -834,7 +845,7 @@ declare sub	R_ShutdownImages ()
 declare sub	 Draw_GetPicSize (w as Integer ptr, h  as Integer ptr, _name as ZString ptr) 
 declare sub  Draw_Pic (x as integer ,y as integer ,_name as  ZString ptr) 
 declare sub  Draw_StretchPic (x as integer, y as integer,w  as integer,h  as integer,_name as ZString ptr)
-declare sub  Draw_Char (x as integer, y as integer, c as integer) 
+declare sub  Draw_Char (x as integer, y as integer, num as integer) 
 declare sub  Draw_TileClear (x as integer, y as integer,w  as integer,h  as integer,_name as ZString ptr)
 declare sub  Draw_Fill (x as integer, y as integer,w  as integer,h  as integer,c as integer ) 
 declare sub	 Draw_FadeScreen () 
@@ -916,6 +927,8 @@ declare sub R_IMFlatShadedQuad(  a as vec3_t ptr, b as vec3_t ptr,c as  vec3_t p
 
 
 extern "C"
+
+
 extern as qboolean		r_lastvertvalid
 
 extern as integer				r_emitted 
@@ -925,13 +938,13 @@ extern as integer	      r_ceilv1
 extern as qboolean		r_nearzionly
 extern as integer		   cacheoffset 
 
-
+declare sub R_InsertNewEdges (edgestoadd as edge_t ptr,edgelist as edge_t ptr)
 
 extern as edge_t	ptr auxedges 
 extern as edge_t	ptr r_edges,  edge_p,  edge_max 
  
-extern as edge_t	 newedges(MAXHEIGHT) 
-extern as edge_t	 removeedges(MAXHEIGHT) 
+extern as edge_t	ptr newedges(MAXHEIGHT) 
+extern as edge_t  ptr	 removeedges(MAXHEIGHT) 
  
 end extern
 
@@ -944,6 +957,12 @@ end extern
 type aliastriangleparms_t
 	as finalvert_t ptr a,  b,  c 
 End Type
+
+extern as aliastriangleparms_t aliastriangleparms
+
+declare sub  R_DrawTriangle()
+
+ 
  
  
 extern as float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter 
@@ -984,6 +1003,11 @@ declare sub R_DrawSprite ()
 extern	as mtexinfo_t		r_skytexinfo(6)
 
 
+ 
+
+extern  r_newrefdef as refdef_t	
+
+
 declare sub R_DrawSubmodelPolygons (pmodel as model_t ptr,clipflags as integer ,topnode as mnode_t ptr)
 declare sub R_DrawSolidClippedSubmodelPolygons (pmodel as model_t ptr, topnode as mnode_t ptr)
 
@@ -992,11 +1016,25 @@ declare sub R_DrawSolidClippedSubmodelPolygons (pmodel as model_t ptr, topnode a
  declare sub  R_ScanEdges
  
 declare sub R_AliasDrawModel ()
-'
+ 
 'declare sub R_RenderFrame (fd as refdef_t ptr)
 
+ declare sub R_DrawPoly( iswater as integer  )
 
 
  extern as  vec5_t	r_clip_verts(2,MAXWORKINGVERTS+2) 
 
  extern as polydesc_t  r_polydesc
+ 
+ extern "C"
+   extern as integer	ptr		   r_turb_turb 
+   
+declare sub R_StepActiveU (pedge as edge_t ptr)
+ end extern
+
+
+extern as qboolean         d_roverwrapped 
+extern as surfcache_t      ptr  sc_rover 
+extern as surfcache_t      ptr d_initial_rover 
+
+extern as integer              r_numallocatededges 
