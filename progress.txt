@@ -1,0 +1,39 @@
+FB_Ref_soft: 
+	r_main.bas FINISHED
+	r_ddraw.bas FINISHED
+	r_sprite.bas FINISHED
+	r_poly.bas FINISHED
+	r_scan.bas FINISHED
+	r_aclip.bas FINISHED
+	r_draw.bas FINISHED
+	r_image.bas FINISHED
+	r_light.bas FINISHED
+        r_surf.bas FINISHED except unneccesary parts
+	r_part.bas FINISHED
+	r_edge.bas FINISHED
+	r_alias.bas FINISHED except unneccesary parts
+	r_bsp.bas FINISHED 
+        r_misc.bas FINISHED 
+        r_model.bas FINISHED 
+	r_rast.bas FINISHED
+      
+r_polyse.bas
+
+
+
+
+
+
+
+
+ 
+
+Game-COMPLETE:
+    	qshared.bas FINISHED
+
+win32-COMPLETE:
+	q_shwin.bas FINISHED
+	rw_dib.bas FINISHED
+	rw_imp.bas FINISHED
+
+
