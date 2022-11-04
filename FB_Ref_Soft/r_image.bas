@@ -367,7 +367,7 @@ sub LoadTGA (_name as zstring ptr, _pic as ubyte ptr ptr,_width as  integer ptr 
    
 	 if (targa_header.id_length <> 0) then
 	 	buf_p += targa_header.id_length '  // skip TARGA image comment
-	 	beep
+	 	'beep
 	 EndIf
 	  
 	

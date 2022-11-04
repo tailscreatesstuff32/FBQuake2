@@ -362,7 +362,7 @@ End Type: type finalvert_t as finalvert_s
 
 #endif
 
-
+extern as mvertex_t	ptr r_pcurrentvertbase 
 
 type affinetridesc_t
  
@@ -406,8 +406,8 @@ End Type
 '// clipped bmodel edges
 
 type bedge_s
-	as mvertex_t  v(2) 
-	as bedge_s ptr  bepnext 
+	as mvertex_t  ptr v(2) 
+	as bedge_s ptr  pnext 
 End Type:type bedge_t as  bedge_s
  
  
@@ -581,7 +581,7 @@ extern as integer              c_surf
 extern as ubyte  r_warpbuffer(WARP_WIDTH * WARP_HEIGHT)
 
 
- declare sub R_ScreenShot_f
+ declare sub R_ScreenShot_f()
 
 
 extern as float    scale_for_mip 
@@ -747,8 +747,9 @@ extern vid_gamma	    as cvar_t	ptr
 
 
 extern  view_clipplanes(4) as clipplane_t      
-extern  pfrustum_indexes(4)  as integer ptr              
-
+extern  pfrustum_indexes(4)  as integer ptr    
+          
+extern as integer              r_frustum_indexes(4*6)
 
 extern as surfcache_s ptr sc_base 
 
@@ -795,13 +796,17 @@ extern "c"
 declare sub R_EdgeCodeStart()
 declare sub R_EdgeCodeEnd()
 
-
+declare sub R_Surf8Start ()
+declare sub R_Surf8End ()
+declare sub R_Surf16Start ()
+declare sub R_Surf16End ()
+ 
 
 extern edge_aftertail as edge_t
 extern edge_tail as edge_t
 
 
-
+declare sub R_Surf8Patch ()
 
 
 end extern
@@ -828,7 +833,7 @@ extern as  qboolean  insubmodel
 
 extern as  uinteger d_8to24table(256)
 
-
+extern as integer              r_clipflags 
 
 declare sub  R_RenderFace (fa as msurface_t ptr, clipflags as integer ) 
 declare sub  R_RenderBmodelFace (pedges as bedge_t ptr,psurf as  msurface_t ptr)
@@ -1001,8 +1006,6 @@ declare sub R_DrawSprite ()
  declare function Draw_FindPic (_name as ZString ptr ) as image_s ptr
 
 extern	as mtexinfo_t		r_skytexinfo(6)
-
-
  
 
 extern  r_newrefdef as refdef_t	
@@ -1030,6 +1033,9 @@ declare sub R_AliasDrawModel ()
    extern as integer	ptr		   r_turb_turb 
    
 declare sub R_StepActiveU (pedge as edge_t ptr)
+
+
+declare sub R_ClipEdge (pv0 as mvertex_t ptr,pv1 as mvertex_t ptr,clip as clipplane_t ptr)
  end extern
 
 
@@ -1038,3 +1044,27 @@ extern as surfcache_t      ptr  sc_rover
 extern as surfcache_t      ptr d_initial_rover 
 
 extern as integer              r_numallocatededges 
+
+extern as float	da_time1, da_time2 
+extern as float	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2 
+extern as float	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2 
+ 
+extern as integer		r_currentkey 
+
+
+extern as float r_time1
+
+
+extern as integer       c_faceclip 
+extern as integer       r_polycount 
+
+extern as mleaf_t		ptr r_viewleaf 
+
+ extern as integer      r_wholepolycount
+ 
+ 
+ 
+extern as integer              r_outofsurfaces 
+ extern as integer              r_outofedges 
+ 
+declare sub    R_FreeUnusedImages ()

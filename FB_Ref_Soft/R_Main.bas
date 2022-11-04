@@ -76,7 +76,7 @@ dim shared as integer		r_drawnpolycount
 dim shared as integer		r_wholepolycount 
 
 dim shared as integer ptr    pfrustum_indexes(4)  
-dim shared as integer		  r_frustum_indexes(4*6) 
+dim shared as integer 		  r_frustum_indexes(4*6) 
 
 dim shared as mleaf_t ptr r_viewleaf
 dim shared as integer	r_viewcluster, r_viewcluster2, r_oldviewcluster, r_oldviewcluster2
@@ -1161,7 +1161,7 @@ End Sub
 'FINISHED FOR NOW'''''''''''''''''''''''''''''''''''''''''
 
 'extern declare sub Draw_BuildGammaTable()
-declare sub Draw_BuildGammaTable()
+ declare sub Draw_BuildGammaTable()
 sub R_BeginFrame(camera_separation as float )
  
 
@@ -1169,9 +1169,9 @@ sub R_BeginFrame(camera_separation as float )
 '** rebuild the gamma correction palette if necessary
 '*/
 if ( vid_gamma->modified ) then
-
-	Draw_BuildGammaTable()
-	R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ))
+ 
+	 Draw_BuildGammaTable()
+	 R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  @d_8to24table(0) ))
 
 	vid_gamma->modified = false
 
@@ -1234,11 +1234,15 @@ End Sub
 '*/
 sub R_GammaCorrectAndSetPalette( _palette as const ubyte ptr)
 	dim as integer i
-
+   
+ 
 	for  i = 0 to 256-1
-		sw_state.currentpalette(i*4+0) = sw_state.gammatable(_palette[i*4+0])
-		sw_state.currentpalette(i*4+1) = sw_state.gammatable(_palette[i*4+1])
-		sw_state.currentpalette(i*4+2) = sw_state.gammatable(_palette[i*4+2])
+		
+
+		
+		sw_state.currentpalette(i*4+0) =  sw_state.gammatable(_palette[i*4+0])
+		sw_state.currentpalette(i*4+1) =  sw_state.gammatable(_palette[i*4+1])
+		sw_state.currentpalette(i*4+2) =  sw_state.gammatable(_palette[i*4+2])
 
 	Next
 
@@ -1283,11 +1287,11 @@ sub R_CinematicSetPalette( _palette as const zstring ptr  )
 			palette32(i*4+3) = &HFF 
 		Next
  
-		'//R_GammaCorrectAndSetPalette( palette32 ) 
+		' //R_GammaCorrectAndSetPalette( palette32 ) 
 	 
 	else
 	 
-		'//R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  d_8to24table))  
+'	 //R_GammaCorrectAndSetPalette( cast( const ubyte ptr,  d_8to24table))  
 	end if
 End Sub
 
@@ -1325,9 +1329,8 @@ sub Draw_BuildGammaTable ()
 		EndIf
 
 		sw_state.gammatable(i) = inf
-							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  								  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  							  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  						  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  					  	  		  	  			  	  		  	  				  	  		  	  			  	  		  	  									Next
-
-End Sub
+	next
+	End Sub
 
 
 
@@ -1438,7 +1441,7 @@ function Draw_GetPalette () as integer
 	dim i  as integer
 	dim as integer 	r, g, b
 
-
+ 
 	LoadPCX ("pics/colormap.pcx", @vid.colormap, @_pal, NULL, NULL)
 	if (vid.colormap = NULL) then
 		'ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx")
@@ -1447,15 +1450,19 @@ function Draw_GetPalette () as integer
 	EndIf
 	vid.alphamap = vid.colormap + 64*256
 
+  _out = cast(ubyte ptr,@d_8to24table(0))
 	for i = 0 to 256-1
 
 		r = _pal[i*3+0]
 		g = _pal[i*3+1]
 		b = _pal[i*3+2]
-
-
+		
+        _out[0] = r
+        _out[1] = g
+        _out[2] = b 
+        _out+=4
 	Next
-
+ 
 
 
 	free (_pal)

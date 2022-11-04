@@ -120,7 +120,7 @@ dim shared as integer		rand1k_index = 0
 #define DPS_MAXSPANS			MAXHEIGHT+1	
 
 
-
+ 
 
 type spanpackage_t 
 	
@@ -155,6 +155,8 @@ dim shared as integer	r_p0(6), r_p1(6), r_p2(6)
 
 dim shared as ubyte ptr d_pcolormap 
 
+
+ extern as integer			d_aflatcolor
 dim shared as integer			d_aflatcolor 
 dim shared as integer			d_xdenom 
 

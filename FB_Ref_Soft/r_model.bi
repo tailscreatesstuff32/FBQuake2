@@ -275,7 +275,7 @@ declare function Mod_ForName (_name as zstring ptr, crash as qboolean ) as model
 declare function Mod_Extradata (_mod as model_t ptr) as any ptr  	'// handles caching
 declare sub	Mod_TouchModel (_name as zstring ptr) 
 
-declare function Mod_PointInLeaf (p as float ptr ,model as model_t ptr) as mleaf_t ptr
+declare function Mod_PointInLeaf (p as vec3_t ptr ,model as model_t ptr) as mleaf_t ptr
 declare function Mod_ClusterPVS (cluster as integer ,model as  model_t ptr) as ubyte	ptr
 
  declare function _Hunk_Begin (maxsize as integer) as any ptr
