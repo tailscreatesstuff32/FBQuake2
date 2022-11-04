@@ -941,7 +941,7 @@ extern as float			  r_nearzi
 extern as float			r_u1, r_v1, r_lzi1 
 extern as integer	      r_ceilv1
 extern as qboolean		r_nearzionly
-extern as integer		   cacheoffset 
+extern as uinteger		   cacheoffset 
 
 declare sub R_InsertNewEdges (edgestoadd as edge_t ptr,edgelist as edge_t ptr)
 
@@ -1068,3 +1068,19 @@ extern as integer              r_outofsurfaces
  extern as integer              r_outofedges 
  
 declare sub    R_FreeUnusedImages ()
+
+
+
+extern "C"
+
+extern as medge_t			ptr r_pedge
+extern as qboolean		r_leftclipped, r_rightclipped 
+extern as mvertex_t	r_leftenter, r_leftexit 
+extern as mvertex_t	r_rightenter, r_rightexit 
+ 
+end extern
+
+
+
+
+

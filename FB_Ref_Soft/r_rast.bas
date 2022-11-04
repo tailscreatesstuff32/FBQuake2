@@ -1,4 +1,21 @@
+'FINISHED FOR NOW////////////////////////////////////////////////////////////////////
+
 #Include "FB_Ref_Soft\r_local.bi"
+
+
+
+extern "C"
+
+extern as medge_t			ptr r_pedge
+extern as qboolean		r_leftclipped, r_rightclipped 
+extern as mvertex_t	r_leftenter, r_leftexit 
+extern as mvertex_t	r_rightenter, r_rightexit 
+ 
+end extern
+
+
+
+
 
 
 #define MAXLEFTCLIPEDGES		100
@@ -7,58 +24,36 @@
 #define FULLY_CLIPPED_CACHED	&H80000000
 #define FRAMECOUNT_MASK			&H7FFFFFFF
 
+dim shared as uinteger		cacheoffset
 
-dim shared as  mtexinfo_t		r_skytexinfo(6)
- 
-dim shared as qboolean		r_nearzionly
 
-static shared as qboolean	makeleftedge, makerightedge
+dim shared as integer			c_faceclip 				'// number of faces clipped
 
-dim shared as integer      sintable(1280) 
-dim shared  as integer      intsintable(1280) 
-dim shared  as integer		blanktable(1280) 		'// PGM
+
 
 
 dim shared  as clipplane_t	 ptr entity_clipplanes 
 dim shared  as clipplane_t	view_clipplanes(4) 
 dim shared  as clipplane_t	world_clipplanes(16) 
 
-dim shared  as qboolean		r_lastvertvalid
 
-dim shared  as integer				r_emitted 
-dim shared  as float			      r_nearzi 
-dim shared as float			r_u1, r_v1, r_lzi1
-dim shared as integer	   r_ceilv1
-
-dim shared as integer		cacheoffset 
-
-extern "C"
-
-extern as medge_t			ptr r_pedge
-
-dim shared  as integer	 skybox_planes(12) 
-
-dim shared as integer box_faces(6)
-
-extern as qboolean		r_leftclipped, r_rightclipped 
-
-extern as mvertex_t	r_leftenter, r_leftexit 
-extern as mvertex_t	r_rightenter, r_rightexit 
+dim shared as medge_t			ptr r_pedge 
 
 
- 
-end extern
+dim shared  as qboolean 	r_leftclipped, r_rightclipped
+static shared as qboolean	makeleftedge, makerightedge
+dim shared as qboolean		r_nearzionly
+
+
+
+dim shared as integer      sintable(1280) 
+dim shared  as integer      intsintable(1280) 
+dim shared  as integer		blanktable(1280) 		'// PGM
+
 
 
 dim shared  as mvertex_t	r_leftenter, r_leftexit 
 dim shared  as mvertex_t	r_rightenter, r_rightexit 
-
-
-dim shared  as qboolean 	r_leftclipped, r_rightclipped
-dim shared as medge_t			ptr r_pedge 
-
-
-dim shared as integer			c_faceclip 				'// number of faces clipped
 
 
 
@@ -66,6 +61,31 @@ type evert_t
    as float	u,v 
 	as integer		ceilv 
 End Type
+
+
+dim shared  as integer				r_emitted 
+dim shared  as float			      r_nearzi 
+dim shared as float			r_u1, r_v1, r_lzi1
+dim shared as integer	   r_ceilv1
+
+ 
+dim shared  as qboolean		r_lastvertvalid
+ dim shared as integer				r_skyframe
+
+ dim shared as msurface_t	ptr	r_skyfaces 
+ dim shared as mplane_t		r_skyplanes(6)
+ dim shared as  mtexinfo_t		r_skytexinfo(6)
+ dim shared as mvertex_t	ptr	r_skyverts 
+ dim shared as medge_t	ptr		r_skyedges 
+ dim shared as integer		ptr		r_skysurfedges 
+
+ 
+
+
+
+
+
+
  
 
  dim shared as vec3_t box_vecs(6,2) 
@@ -74,14 +94,14 @@ End Type
  
 
 'dim shared as qboolean		r_lastvertvalid 
- dim shared as integer				r_skyframe 
+ 
 '
- dim shared as msurface_t	ptr	r_skyfaces 
- dim shared as mplane_t		r_skyplanes(6)
- dim shared as mvertex_t	ptr	r_skyverts 
-dim shared as medge_t	ptr		r_skyedges 
- dim shared as integer		ptr		r_skysurfedges 
 
+
+
+
+dim shared  as integer	 skybox_planes(12) 
+dim shared as integer box_faces(6)
 
 dim shared as float box_verts(8,3)
 
@@ -649,9 +669,9 @@ sub R_RenderBmodelFace (pedges as bedge_t ptr,psurf as msurface_t ptr)
 	
 	r_polycount+=1
  
-	surface_p->msurf = fa 
+	surface_p->msurf = psurf 
 	surface_p->nearzi = r_nearzi 
-	surface_p->flags = fa->flags 
+	surface_p->flags = psurf->flags 
 	surface_p->insubmodel = insubmodel 
 	surface_p->spanstate = 0 
 	surface_p->entity = currententity 
