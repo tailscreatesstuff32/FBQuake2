@@ -4,17 +4,6 @@
 
 
 
-extern "C"
-
-extern as medge_t			ptr r_pedge
-extern as qboolean		r_leftclipped, r_rightclipped 
-extern as mvertex_t	r_leftenter, r_leftexit 
-extern as mvertex_t	r_rightenter, r_rightexit 
- 
-end extern
-
-
-
 
 
 
@@ -79,31 +68,39 @@ dim shared  as qboolean		r_lastvertvalid
  dim shared as medge_t	ptr		r_skyedges 
  dim shared as integer		ptr		r_skysurfedges 
 
+ dim shared  as integer	 skybox_planes(12) => {2,-128, 0,-128, 2,128, 1,128, 0,128, 1,-128} 
+dim shared as integer box_surfedges(24) => { 1,2,3,4,  -1,5,6,7,  8,9,-6,10,  -2,-7,-9,11, _
+  12,-3,-11,-8,  -12,-10,-5,-4}
+
+  dim shared as integer box_edges(24) => { 1,2, 2,3, 3,4, 4,1, 1,5, 5,6, 6,2, 7,8, 8,6, 5,7, 8,3, 7,4} 
+ dim shared as integer box_faces(6) => {0,0,2,2,2,0}
+ 
+ dim shared as vec3_t box_vecs(6,2) => { _
+	{	({0,-1,0}), ({-1,0,0}) }, _
+	{ ({0,1,0}), ({0,0,-1}) }, _
+	{	({0,-1,0}), ({1,0,0}) } , _
+	{ ({1,0,0}), ({0,0,-1}) }, _
+	{ ({0,-1,0}), ({0,0,-1}) }, _
+	{ ({-1,0,0}), ({0,0,-1}) } _
+}
  
 
+dim shared as float box_verts(8,3) => { _
+	{-1,-1,-1}, _
+	{-1,1,-1}, _
+	{1,1,-1}, _
+	{1,-1,-1},_
+	{-1,-1,1},  _
+	{-1,1,1}, _
+	{1,-1,1}, _
+	{1,1,1} _
+}
 
 
 
 
 
- 
 
- dim shared as vec3_t box_vecs(6,2) 
- 
-  dim shared as integer box_edges(24) 
- 
-
-'dim shared as qboolean		r_lastvertvalid 
- 
-'
-
-
-
-
-dim shared  as integer	 skybox_planes(12) 
-dim shared as integer box_faces(6)
-
-dim shared as float box_verts(8,3)
 
 
 extern as model_t ptr loadmodel
