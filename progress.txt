@@ -16,8 +16,8 @@ FB_Ref_soft:
         r_misc.bas FINISHED 
         r_model.bas FINISHED 
 	r_rast.bas FINISHED
-      
-r_polyse.bas
+      	r_polyse.bas FINISHED except unneccesary parts
+
 
 
 
