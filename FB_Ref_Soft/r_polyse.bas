@@ -1,3 +1,6 @@
+'FINISHED FOR NOW///////////////////////////////////////////////////////////////////////
+
+
 #Include "FB_Ref_Soft\r_local.bi"
 
 
@@ -120,14 +123,14 @@ dim shared as integer		rand1k_index = 0
 #define DPS_MAXSPANS			MAXHEIGHT+1	
 
 
- 
+ static shared as integer				ystart 
 
 type spanpackage_t 
 	
    as any ptr	 pdest 
 	as short	 ptr   pz 
 	as integer	   count 
-	as ubyte			ptex 
+	as ubyte	ptr		ptex 
 	as integer	  sfrac, tfrac, light, zi 
   
 
@@ -227,9 +230,1064 @@ type adivtab_t
 	as integer		remainder 
 End Type
 
- static shared as adivtab_t	adivtab(32*32) '=>' {
-'#include "adivtab.h"
-'};
+static shared as adivtab_t	adivtab(32*32)  =>  { _
+ (1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(1, -5), _
+(1, -6), _
+(1, -7), _
+(2, -1), _
+(2, -3), _
+(3, 0), _
+(3, -3), _
+(5, 0), _
+(7, -1), _
+(15, 0), _
+(0, 0), _
+(-15, 0), _
+(-8, 1), _
+(-5, 0), _
+(-4, 1), _
+(-3, 0), _
+(-3, 3), _
+(-3, 6), _
+(-2, 1), _
+(-2, 3), _
+(-2, 5), _
+(-2, 7), _
+(-2, 9), _
+(-2, 11), _
+(-2, 13), _
+(-1, 0), _
+(-1, 1), _
+/' numerator = -14'/ _
+(0, -14), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(1, -5), _
+(1, -6), _
+(2, 0), _
+(2, -2), _
+(2, -4), _
+(3, -2), _
+(4, -2), _
+(7, 0), _
+(14, 0), _
+(0, 0), _
+(-14, 0), _
+(-7, 0), _
+(-5, 1), _
+(-4, 2), _
+(-3, 1), _
+(-3, 4), _
+(-2, 0), _
+(-2, 2), _
+(-2, 4), _
+(-2, 6), _
+(-2, 8), _
+(-2, 10), _
+(-2, 12), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+/' numerator = -13'/ _
+(0, -13), _
+(0, -13), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(1, -5), _
+(1, -6), _
+(2, -1), _
+(2, -3), _
+(3, -1), _
+(4, -1), _
+(6, -1), _
+(13, 0), _
+(0, 0), _
+(-13, 0), _
+(-7, 1), _
+(-5, 2), _
+(-4, 3), _
+(-3, 2), _
+(-3, 5), _
+(-2, 1), _
+(-2, 3), _
+(-2, 5), _
+(-2, 7), _
+(-2, 9), _
+(-2, 11), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+/' numerator = -12'/ _
+(0, -12), _
+(0, -12), _
+(0, -12), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(1, -5), _
+(2, 0), _
+(2, -2), _
+(3, 0), _
+(4, 0), _
+(6, 0), _
+(12, 0), _
+(0, 0), _
+(-12, 0), _
+(-6, 0), _
+(-4, 0), _
+(-3, 0), _
+(-3, 3), _
+(-2, 0), _
+(-2, 2), _
+(-2, 4), _
+(-2, 6), _
+(-2, 8), _
+(-2, 10), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+/' numerator = -11'/ _
+(0, -11), _
+(0, -11), _
+(0, -11), _
+(0, -11), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(1, -5), _
+(2, -1), _
+(2, -3), _
+(3, -2), _
+(5, -1), _
+(11, 0), _
+(0, 0), _
+(-11, 0), _
+(-6, 1), _
+(-4, 1), _
+(-3, 1), _
+(-3, 4), _
+(-2, 1), _
+(-2, 3), _
+(-2, 5), _
+(-2, 7), _
+(-2, 9), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+/' numerator = -10'/ _
+(0, -10), _
+(0, -10), _
+(0, -10), _
+(0, -10), _
+(0, -10), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(2, 0), _
+(2, -2), _
+(3, -1), _
+(5, 0), _
+(10, 0), _
+(0, 0), _
+(-10, 0), _
+(-5, 0), _
+(-4, 2), _
+(-3, 2), _
+(-2, 0), _
+(-2, 2), _
+(-2, 4), _
+(-2, 6), _
+(-2, 8), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+/' numerator = -9'/ _
+(0, -9), _
+(0, -9), _
+(0, -9), _
+(0, -9), _
+(0, -9), _
+(0, -9), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(1, -4), _
+(2, -1), _
+(3, 0), _
+(4, -1), _
+(9, 0), _
+(0, 0), _
+(-9, 0), _
+(-5, 1), _
+(-3, 0), _
+(-3, 3), _
+(-2, 1), _
+(-2, 3), _
+(-2, 5), _
+(-2, 7), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+/' numerator = -8'/ _
+(0, -8), _
+(0, -8), _
+(0, -8), _
+(0, -8), _
+(0, -8), _
+(0, -8), _
+(0, -8), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(2, 0), _
+(2, -2), _
+(4, 0), _
+(8, 0), _
+(0, 0), _
+(-8, 0), _
+(-4, 0), _
+(-3, 1), _
+(-2, 0), _
+(-2, 2), _
+(-2, 4), _
+(-2, 6), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+/' numerator = -7'/ _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(0, -7), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(1, -3), _
+(2, -1), _
+(3, -1), _
+(7, 0), _
+(0, 0), _
+(-7, 0), _
+(-4, 1), _
+(-3, 2), _
+(-2, 1), _
+(-2, 3), _
+(-2, 5), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+/' numerator = -6'/ _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(0, -6), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(2, 0), _
+(3, 0), _
+(6, 0), _
+(0, 0), _
+(-6, 0), _
+(-3, 0), _
+(-2, 0), _
+(-2, 2), _
+(-2, 4), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+/' numerator = -5'/ _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(0, -5), _
+(1, 0), _
+(1, -1), _
+(1, -2), _
+(2, -1), _
+(5, 0), _
+(0, 0), _
+(-5, 0), _
+(-3, 1), _
+(-2, 1), _
+(-2, 3), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+(-1, 11), _
+/' numerator = -4'/ _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(0, -4), _
+(1, 0), _
+(1, -1), _
+(2, 0), _
+(4, 0), _
+(0, 0), _
+(-4, 0), _
+(-2, 0), _
+(-2, 2), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+(-1, 11), _
+(-1, 12), _
+/' numerator = -3'/ _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(0, -3), _
+(1, 0), _
+(1, -1), _
+(3, 0), _
+(0, 0), _
+(-3, 0), _
+(-2, 1), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+(-1, 11), _
+(-1, 12), _
+(-1, 13), _
+/' numerator = -2'/ _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(0, -2), _
+(1, 0), _
+(2, 0), _
+(0, 0), _
+(-2, 0), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+(-1, 11), _
+(-1, 12), _
+(-1, 13), _
+(-1, 14), _
+/' numerator = -1'/ _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(0, -1), _
+(1, 0), _
+(0, 0), _
+(-1, 0), _
+(-1, 1), _
+(-1, 2), _
+(-1, 3), _
+(-1, 4), _
+(-1, 5), _
+(-1, 6), _
+(-1, 7), _
+(-1, 8), _
+(-1, 9), _
+(-1, 10), _
+(-1, 11), _
+(-1, 12), _
+(-1, 13), _
+(-1, 14), _
+(-1, 15), _
+/' numerator = 0'/ _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+(0, 0), _
+/'/ numerator = 1'/ _
+(-1, -14), _
+(-1, -13), _
+(-1, -12), _
+(-1, -11), _
+(-1, -10), _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(0, 0), _
+(1, 0), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+(0, 1), _
+/'/ numerator = 2'/ _
+(-1, -13), _
+(-1, -12), _
+(-1, -11), _
+(-1, -10), _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, 0), _
+(0, 0), _
+(2, 0), _
+(1, 0), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+(0, 2), _
+/'/ numerator = 3'/ _
+(-1, -12), _
+(-1, -11), _
+(-1, -10), _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -1), _
+(-3, 0), _
+(0, 0), _
+(3, 0), _
+(1, 1), _
+(1, 0), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+(0, 3), _
+/'/ numerator = 4'/ _
+(-1, -11), _
+(-1, -10), _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -2), _
+(-2, 0), _
+(-4, 0), _
+(0, 0), _
+(4, 0), _
+(2, 0), _
+(1, 1), _
+(1, 0), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+(0, 4), _
+/' numerator = 5'/ _
+(-1, -10), _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -3), _
+(-2, -1), _
+(-3, -1), _
+(-5, 0), _
+(0, 0), _
+(5, 0), _
+(2, 1), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+(0, 5), _
+/' numerator = 6'/ _
+(-1, -9), _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, 0), _
+(-6, 0), _
+(0, 0), _
+(6, 0), _
+(3, 0), _
+(2, 0), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+(0, 6), _
+/' numerator = 7'/ _
+(-1, -8), _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -5), _
+(-2, -3), _
+(-2, -1), _
+(-3, -2), _
+(-4, -1), _
+(-7, 0), _
+(0, 0), _
+(7, 0), _
+(3, 1), _
+(2, 1), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+(0, 7), _
+/' numerator = 8'/ _
+(-1, -7), _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -6), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, -1), _
+(-4, 0), _
+(-8, 0), _
+(0, 0), _
+(8, 0), _
+(4, 0), _
+(2, 2), _
+(2, 0), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+(0, 8), _
+/' numerator = 9'/ _
+(-1, -6), _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -7), _
+(-2, -5), _
+(-2, -3), _
+(-2, -1), _
+(-3, -3), _
+(-3, 0), _
+(-5, -1), _
+(-9, 0), _
+(0, 0), _
+(9, 0), _
+(4, 1), _
+(3, 0), _
+(2, 1), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 9), _
+(0, 9), _
+(0, 9), _
+(0, 9), _
+(0, 9), _
+(0, 9), _
+(0, 9), _
+/' numerator = 10'/ _
+(-1, -5), _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -8), _
+(-2, -6), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, -2), _
+(-4, -2), _
+(-5, 0), _
+(-10, 0), _
+(0, 0), _
+(10, 0), _
+(5, 0), _
+(3, 1), _
+(2, 2), _
+(2, 0), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 10), _
+(0, 10), _
+(0, 10), _
+(0, 10), _
+(0, 10), _
+(0, 10), _
+/' numerator = 11'/ _
+(-1, -4), _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -9), _
+(-2, -7), _
+(-2, -5), _
+(-2, -3), _
+(-2, -1), _
+(-3, -4), _
+(-3, -1), _
+(-4, -1), _
+(-6, -1), _
+(-11, 0), _
+(0, 0), _
+(11, 0), _
+(5, 1), _
+(3, 2), _
+(2, 3), _
+(2, 1), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 11), _
+(0, 11), _
+(0, 11), _
+(0, 11), _
+(0, 11), _
+/' numerator = 12'/ _
+(-1, -3), _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -10), _
+(-2, -8), _
+(-2, -6), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, -3), _
+(-3, 0), _
+(-4, 0), _
+(-6, 0), _
+(-12, 0), _
+(0, 0), _
+(12, 0), _
+(6, 0), _
+(4, 0), _
+(3, 0), _
+(2, 2), _
+(2, 0), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 12), _
+(0, 12), _
+(0, 12), _
+(0, 12), _
+/' numerator = 13'/ _
+(-1, -2), _
+(-1, -1), _
+(-1, 0), _
+(-2, -11), _
+(-2, -9), _
+(-2, -7), _
+(-2, -5), _
+(-2, -3), _
+(-2, -1), _
+(-3, -5), _
+(-3, -2), _
+(-4, -3), _
+(-5, -2), _
+(-7, -1), _
+(-13, 0), _
+(0, 0), _
+(13, 0), _
+(6, 1), _
+(4, 1), _
+(3, 1), _
+(2, 3), _
+(2, 1), _
+(1, 6), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 13), _
+(0, 13), _
+(0, 13), _
+/' numerator = 14'/ _
+(-1, -1), _
+(-1, 0), _
+(-2, -12), _
+(-2, -10), _
+(-2, -8), _
+(-2, -6), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, -4), _
+(-3, -1), _
+(-4, -2), _
+(-5, -1), _
+(-7, 0), _
+(-14, 0), _
+(0, 0), _
+(14, 0), _
+(7, 0), _
+(4, 2), _
+(3, 2), _
+(2, 4), _
+(2, 2), _
+(2, 0), _
+(1, 6), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 14), _
+(0, 14), _
+/' numerator = 15'/ _
+(-1, 0), _
+(-2, -13), _
+(-2, -11), _
+(-2, -9), _
+(-2, -7), _
+(-2, -5), _
+(-2, -3), _
+(-2, -1), _
+(-3, -6), _
+(-3, -3), _
+(-3, 0), _
+(-4, -1), _
+(-5, 0), _
+(-8, -1), _
+(-15, 0), _
+(0, 0), _
+(15, 0), _
+(7, 1), _
+(5, 0), _
+(3, 3), _
+(3, 0), _
+(2, 3), _
+(2, 1), _
+(1, 7), _
+(1, 6), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0), _
+(0, 15), _
+/' numerator = 16'/ _
+(-2, -14), _
+(-2, -12), _
+(-2, -10), _
+(-2, -8), _
+(-2, -6), _
+(-2, -4), _
+(-2, -2), _
+(-2, 0), _
+(-3, -5), _
+(-3, -2), _
+(-4, -4), _
+(-4, 0), _
+(-6, -2), _
+(-8, 0), _
+(-16, 0), _
+(0, 0), _
+(16, 0), _
+(8, 0), _
+(5, 1), _
+(4, 0), _
+(3, 1), _
+(2, 4), _
+(2, 2), _
+(2, 0), _
+(1, 7), _
+(1, 6), _
+(1, 5), _
+(1, 4), _
+(1, 3), _
+(1, 2), _
+(1, 1), _
+(1, 0)  _
+/'#include "adivtab.h"'/  _
+} 
 
 dim shared as ubyte ptr skintable(MAX_LBM_HEIGHT) 
 dim shared as integer		skinwidth 
@@ -251,7 +1309,11 @@ declare sub R_PolysetCalcGradients (skinwidth as integer )
 declare sub R_DrawNonSubdiv () 
 declare sub R_PolysetSetEdgeTable ()
 declare sub R_RasterizeAliasPolySmooth () 
+
+extern "C"
 declare sub R_PolysetScanLeftEdge( _height as integer) 
+end extern
+
 declare sub R_PolysetScanLeftEdge_C(_height as integer) 
 
 
@@ -301,10 +1363,14 @@ dim shared as ubyte irtable(256) =>	 { 79, 78, 77, 76, 75, 74, 73, 72, _		/' bla
 												  64, 65, 66, 67, 68, 69, 70, 71, _		/' fire colors'/
 												  72, 73, 74, 75, 76, 77, 78, 79, _
 												  208, 208, 64, 64, 70, 71, 72, 64, _		/' mishmash1'/
-												  66, 68, 70, 64, 65, 66, 67, 68} 		/' mishmash2'/					 
+												  66, 68, 70, 64, 65, 66, 67, 68} 		/' mishmash2'/			
+												  
+												 		 
 						 
 '// PGM
 '// ======================						 
+
+
 
 '/*
 '================
@@ -329,6 +1395,8 @@ sub R_PolysetUpdateTables ()
 	end if
 	
 End Sub
+  
+  
   
   
   
@@ -396,6 +1464,75 @@ sub R_DrawTriangle()
 	end if
 end sub
 
+
+
+
+
+/'
+===================
+R_PolysetScanLeftEdge_C
+====================
+'/
+sub R_PolysetScanLeftEdge_C(_height as integer )
+  
+	 do 
+	 
+	 	d_pedgespanpackage->pdest = d_pdest 
+ 		d_pedgespanpackage->pz = d_pz 
+ 		d_pedgespanpackage->count = d_aspancount 
+  		d_pedgespanpackage->ptex = d_ptex 
+ 
+ 		d_pedgespanpackage->sfrac = d_sfrac 
+ 		d_pedgespanpackage->tfrac = d_tfrac 
+ 
+'	// FIXME: need to clamp l, s, t, at both ends?
+ 		d_pedgespanpackage->light = d_light 
+ 		d_pedgespanpackage->zi = d_zi 
+ 
+ 		d_pedgespanpackage+=1 
+ 
+ 		errorterm += erroradjustup 
+ 		if (errorterm >= 0) then
+ 
+ 			d_pdest += d_pdestextrastep 
+ 			d_pz += d_pzextrastep 
+ 			d_aspancount += d_countextrastep 
+ 			d_ptex += d_ptexextrastep 
+ 			d_sfrac += d_sfracextrastep 
+ 			d_ptex += d_sfrac shr 16 
+ 
+ 			d_sfrac and= &HFFFF 
+ 			d_tfrac += d_tfracextrastep 
+ 			if (d_tfrac and &H10000) then
+ 
+ 				d_ptex += r_affinetridesc.skinwidth 
+   			d_tfrac and= &HFFFF  
+ 			end if
+ 			d_light += d_lightextrastep 
+ 			d_zi += d_ziextrastep 
+ 			errorterm -= erroradjustdown 
+ 
+ 	else
+ 
+ 			d_pdest += d_pdestbasestep 
+ 			d_pz += d_pzbasestep 
+ 			d_aspancount += ubasestep 
+ 			d_ptex += d_ptexbasestep 
+ 			d_sfrac += d_sfracbasestep 
+ 			d_ptex += d_sfrac shr 16 
+ 			d_sfrac and= &HFFFF 
+ 			d_tfrac += d_tfracbasestep 
+ 			if (d_tfrac and &H10000) then
+ 
+ 				d_ptex += r_affinetridesc.skinwidth 
+ 				d_tfrac and= &HFFFF 
+ 			end if 
+ 			d_light += d_lightbasestep 
+ 			d_zi += d_zibasestep 
+ 		end if
+  _height -=1
+ 	loop while (_height) 
+end sub
 
 '/*
 '===================
@@ -482,123 +1619,9 @@ end sub
 
 
 
-'/*
-'================
-'R_PolysetFillSpans8
-'================
-'*/
-sub R_PolysetFillSpans8 (pspanpackage as spanpackage_t ptr )
- 
- 	dim as integer				_color 
-'
-'' FIXME: do z buffering
- d_aflatcolor+=1
-   _color = d_aflatcolor
-'
- do while (1)
-   
- 	dim as 	integer	 lcount 
- 	dim as 	ubyte	ptr lpdest 
- 
-   	lcount = pspanpackage->count 
- 
- 		if (lcount = -1) then
-   		 return 
- 		EndIf
- 			
- 
- 		if (lcount) then
- 			   		lpdest = pspanpackage->pdest 
- 
- 			do
-  		 
- 				 *lpdest = _color: lpdest+=1 
- 				
- 				 lcount-=1
- 			loop	 while (lcount) 
- 			
- 		EndIf
- 
- 		pspanpackage+=1
- 	 loop
-end sub 
 
 
-sub R_RasterizeAliasPolySmooth () 
-	
-	
-	
-End Sub
 
-'/*
-'================
-'R_PolysetSetEdgeTable
-'================
-'*/
-sub R_PolysetSetEdgeTable ()
- 
-	dim as integer			edgetableindex 
-
-	edgetableindex = 0 	'// assume the vertices are already in
-						'//  top to bottom order
-
-'//
-'// determine which edges are right & left, and the order in which
-'// to rasterize them
-'//
-	if (r_p0(1) >= r_p1(1)) then
-	 if (r_p0(1) = r_p1(1)) then
- 
-	 		if (r_p0(1) < r_p2(1)) then
-		   	pedgetable = @edgetables(2) 
-		 	else
-		   	pedgetable = @edgetables(5) 
-			end if
-		 	return 
-		 
-		 else
-		 
-	 	edgetableindex = 1 
- 
-		EndIf
-	EndIf
- 
-
-
-	if (r_p0(1) = r_p2(1)) then
-		
-			if (edgetableindex) then
-			pedgetable = @edgetables(8)
-		else
-			pedgetable = @edgetables(9)
-
-		return 
-		
-	EndIf
-	 
- 
-	elseif (r_p1(1) = r_p2(1)) then
- 
-		if (edgetableindex) then
-			pedgetable = @edgetables(10) 
-		else
-			pedgetable = @edgetables(11) 
-		end if
-		return 
-	end if
-
-	 if (r_p0(1) > r_p2(1)) then
-	 	edgetableindex += 2
-	 EndIf
-	 	 
-
-	 if (r_p1(1) > r_p2(1)) then
-	 	edgetableindex += 4 
-	 EndIf
-	 	
-
-	pedgetable = @edgetables(edgetableindex) 
-end sub
 
 
 
@@ -887,7 +1910,867 @@ done_with_steps:
 end asm
 
 end sub
+
+#else
+
+
+sub R_PolysetCalcGradients (skinwidth as integer )
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+End Sub
+
+
+
+
+
 #endif
 
 
 
+
+/'
+================
+R_PolysetDrawThreshSpans8
+
+Random fizzle fade rasterizer
+================
+'/
+sub R_PolysetDrawThreshSpans8 (pspanpackage as spanpackage_t ptr)
+ 
+	dim as integer		lcount 
+	dim as ubyte	ptr lpdest 
+	dim as ubyte	ptr lptex 
+	dim as integer		lsfrac, ltfrac 
+	dim as integer		llight 
+	dim as integer		lzi 
+	dim as short	ptr lpz 
+
+	do
+ 
+		lcount = d_aspancount - pspanpackage->count 
+
+		errorterm += erroradjustup 
+		if (errorterm >= 0) then
+		 
+			d_aspancount += d_countextrastep 
+			errorterm -= erroradjustdown 
+		 
+		else
+		 
+			d_aspancount += ubasestep 
+		 end if
+
+		if (lcount) then
+		 
+			lpdest = pspanpackage->pdest 
+		   lptex = pspanpackage->ptex 
+			lpz = pspanpackage->pz 
+			lsfrac = pspanpackage->sfrac 
+			ltfrac = pspanpackage->tfrac 
+			llight = pspanpackage->light 
+			lzi = pspanpackage->zi 
+
+			do
+			 
+				if ((lzi shr 16) >= *lpz) then
+				 
+					rand1k_index = (rand1k_index + 1) and MASK_1K 
+
+					if (rand1k(rand1k_index) <= r_affinetridesc.vis_thresh) then
+					 
+						*lpdest = cast(byte ptr,vid.colormap)[*lptex + (llight and &HFF00)] 
+						*lpz = lzi shr 16 
+					end if
+				end if
+
+				lpdest+=1
+				lzi += r_zistepx 
+				lpz+=1
+				llight += r_lstepx 
+				lptex += a_ststepxwhole 
+				lsfrac += a_sstepxfrac 
+				lptex += lsfrac shr 16 
+				lsfrac and= &HFFFF 
+				ltfrac += a_tstepxfrac 
+				if (ltfrac and &H10000) then
+				 
+					lptex += r_affinetridesc.skinwidth 
+					ltfrac and= &HFFFF 
+				endif
+				lcount-=1
+			loop while (lcount) 
+		end if
+
+		pspanpackage+=1
+			loop while (pspanpackage->count <> -999999) 
+end sub
+
+
+
+
+
+
+/'
+================
+R_PolysetDrawSpans8
+================
+'/
+sub R_PolysetDrawSpans8_33(pspanpackage as spanpackage_t ptr)
+ 
+	dim as integer		lcount 
+	dim as ubyte	ptr lpdest 
+	dim as ubyte	ptr lptex 
+	dim as integer		lsfrac, ltfrac 
+	dim as integer		llight 
+	dim as integer		lzi 
+	dim as short	ptr lpz 
+ 
+ 	do
+ 
+ 		lcount = d_aspancount - pspanpackage->count 
+ 
+ 		errorterm += erroradjustup 
+ 		if (errorterm >= 0) then
+ 
+ 			d_aspancount += d_countextrastep 
+ 			errorterm -= erroradjustdown 
+ 
+ 		else
+ 
+ 			d_aspancount += ubasestep 
+ 
+        end if
+ 		if (lcount) then
+ 
+			lpdest = pspanpackage->pdest 
+			lptex = pspanpackage->ptex 
+			lpz = pspanpackage->pz 
+			lsfrac = pspanpackage->sfrac 
+			ltfrac = pspanpackage->tfrac 
+			llight = pspanpackage->light 
+			lzi = pspanpackage->zi 
+ 
+ 			do
+ 
+ 				if ((lzi shr 16) >= *lpz) then
+				 
+				    dim as integer temp = vid.colormap[*lptex + ( llight and &HFF00 )] 
+
+					*lpdest = vid.alphamap[temp+ *lpdest*256] 
+				end if
+				lpdest+=1
+				lzi += r_zistepx 
+				lpz+=1
+				llight += r_lstepx 
+				lptex += a_ststepxwhole 
+				lsfrac += a_sstepxfrac 
+				lptex += lsfrac shr 16 
+				lsfrac and= &HFFFF 
+				ltfrac += a_tstepxfrac 
+ 				if (ltfrac and &H10000) then
+ 
+ 					lptex += r_affinetridesc.skinwidth 
+ 					ltfrac and= &HFFFF 
+ 				end if
+			lcount-=1
+ 			loop while (lcount) 
+ 		end if
+ 
+ 		pspanpackage+=1
+ 	loop while (pspanpackage->count <> -999999) 
+end sub
+
+
+
+sub R_PolysetDrawSpansConstant8_33(pspanpackage as spanpackage_t ptr)
+ 
+	dim as integer		lcount 
+	dim as ubyte	ptr lpdest 
+	dim as integer		lzi 
+	dim as short	ptr lpz 
+
+	 do
+	 
+ 		lcount = d_aspancount - pspanpackage->count 
+
+	 	errorterm += erroradjustup 
+	 	if (errorterm >= 0) then
+	 
+	 		d_aspancount += d_countextrastep 
+	 		errorterm -= erroradjustdown 
+	 
+	 	else
+	 
+	 		d_aspancount += ubasestep 
+	 	end if
+
+	 	if (lcount) then
+	 
+	 		lpdest = pspanpackage->pdest 
+	 		lpz = pspanpackage->pz 
+	 		lzi = pspanpackage->zi 
+
+	 		do
+	 
+	 			if ((lzi shr 16) >= *lpz) then
+	 			 
+	 				*lpdest = vid.alphamap[r_aliasblendcolor + *lpdest*256] 
+	 			end if
+	 			lpdest+=1
+	 			lzi += r_zistepx 
+	 			lpz+=1
+	 			lcount-=1 
+	 		loop while (lcount) 
+	 	end if
+
+	 	pspanpackage+=1 
+	loop while (pspanpackage->count <> -999999) 
+end sub
+
+
+
+
+
+
+sub R_PolysetDrawSpans8_66(pspanpackage as spanpackage_t ptr)
+ 
+	dim as integer		lcount 
+	dim as ubyte	ptr lpdest 
+	dim as ubyte	ptr lptex 
+	dim as integer		lsfrac, ltfrac 
+	dim as integer		llight 
+	dim as integer		lzi 
+	dim as short	ptr lpz 
+
+	 do
+	 
+ 		lcount = d_aspancount - pspanpackage->count 
+
+	 	errorterm += erroradjustup 
+	 	if (errorterm >= 0) then
+	 
+	 		d_aspancount += d_countextrastep 
+	 		errorterm -= erroradjustdown 
+	 
+	 	else
+	  
+	 		d_aspancount += ubasestep 
+	 	end if
+
+	 	if (lcount) then
+	 
+			lpdest = pspanpackage->pdest 
+			lptex = pspanpackage->ptex 
+			lpz = pspanpackage->pz 
+			lsfrac = pspanpackage->sfrac 
+			ltfrac = pspanpackage->tfrac 
+			llight = pspanpackage->light 
+			lzi = pspanpackage->zi 
+
+	 		do
+	 
+	 			if ((lzi shr 16) >= *lpz) then
+	 
+	 				dim as integer temp = vid.colormap[*lptex + ( llight and &HFF00 )] 
+
+	 				*lpdest = vid.alphamap[temp*256 + *lpdest] 
+	 				*lpz = lzi shr 16 
+	 			end if
+	 			lpdest+=1
+	 			lzi += r_zistepx 
+	 			lpz+=1
+	 			llight += r_lstepx 
+	 			lptex += a_ststepxwhole 
+	 			lsfrac += a_sstepxfrac 
+	 			lptex += lsfrac shr 16 
+	 			lsfrac and= &HFFFF 
+	 			ltfrac += a_tstepxfrac 
+	 			if (ltfrac and &H10000) then
+	 
+	 				lptex += r_affinetridesc.skinwidth 
+	 				ltfrac and= &HFFFF 
+	 			end if
+	 		loop while (--lcount) 
+	 	end if
+
+	 	pspanpackage+=1
+	 loop while (pspanpackage->count <> -999999) 
+end sub
+
+
+
+sub R_PolysetDrawSpansConstant8_66(pspanpackage as spanpackage_t ptr)
+ 
+	dim lcount as  integer		
+	dim lpdest  as ubyte	ptr
+	dim as integer		lzi 
+	dim as short ptr	lpz 
+
+	do
+	 
+		lcount = d_aspancount - pspanpackage->count 
+
+		errorterm += erroradjustup 
+		if (errorterm >= 0) then
+		  
+			d_aspancount += d_countextrastep 
+			errorterm -= erroradjustdown 
+		 
+		else
+	 
+			d_aspancount += ubasestep 
+		end if
+
+		if (lcount) then
+	 
+			lpdest = pspanpackage->pdest 
+			lpz = pspanpackage->pz 
+			lzi = pspanpackage->zi  
+
+			do
+			 
+				if ((lzi shr 16) >= *lpz) then
+				 
+					*lpdest = vid.alphamap[r_aliasblendcolor*256 + *lpdest] 
+				end if
+				lpdest+=1
+				lzi += r_zistepx 
+				lpz+=1
+			  lcount+=1
+			loop while (lcount) 
+		end if 
+
+		pspanpackage+=1
+	loop while (pspanpackage->count <> -999999) 
+end sub
+
+
+#ifndef id386
+sub R_PolysetDrawSpans8_Opaque (pspanpackage as spanpackage_t ptr)
+' 
+'	dim as integer		lcount 
+'
+'	do
+'	 
+'		lcount = d_aspancount - pspanpackage->count; 
+'
+'		errorterm += erroradjustup 
+'		if (errorterm >= 0) then
+'		 
+'			d_aspancount += d_countextrastep 
+'			errorterm -= erroradjustdown 
+'	 
+'		else
+'		 
+'			d_aspancount += ubasestep 
+'		end if
+'
+'		if (lcount) then
+'		 
+'		   dim as integer		lsfrac, ltfrac 
+'			dim as ubyte	ptr lpdest 
+'			dim as ubyte	ptr lptex 
+'			dim as integer		llight 
+'			dim as integer		lzi 
+'			dim as short	ptr lpz 
+'
+'			lpdest = pspanpackage->pdest 
+'			lptex = pspanpackage->ptex 
+'			lpz = pspanpackage->pz 
+'			lsfrac = pspanpackage->sfrac 
+'			ltfrac = pspanpackage->tfrac 
+'			llight = pspanpackage->light 
+'			lzi = pspanpackage->zi 
+'
+'			do
+'			 
+'				if ((lzi shr 16) >= *lpz) then
+'					
+'				
+'				 
+''//PGM
+'					if(r_newrefdef.rdflags and RDF_IRGOGGLES andalso currententity->flags and RF_IR_VISIBLE) then
+'						*lpdest = cast((ubyte ptr,vid.colormap)[irtable(*lptex)] 
+'					else
+'					*lpdest = (cast(ubyte ptr, vid.colormap)[*lptex + (llight and &HFF00)] 
+''//PGM
+'					*lpz = lzi shr 16 
+'				EndIf
+'				lpdest+=1
+'				lzi += r_zistepx 
+'				lpz++ 
+'				llight += r_lstepx 
+'				lptex += a_ststepxwhole 
+'				lsfrac += a_sstepxfrac 
+'				lptex += lsfrac ahr 16 
+'				lsfrac and= 0xFFFF 
+'				ltfrac += a_tstepxfrac 
+'				if (ltfrac and &H10000) then
+'				 
+'					lptex += r_affinetridesc.skinwidth 
+'					ltfrac and= &HFFFF 
+'				end if
+'				 lcount-=1
+'			loop while (lcount) 
+'		end if
+'
+'		pspanpackage+=1
+'	loop while (pspanpackage->count <> -999999) 
+end sub
+#endif
+
+
+'/*
+'================
+'R_PolysetFillSpans8
+'================
+'*/
+sub R_PolysetFillSpans8 (pspanpackage as spanpackage_t ptr )
+ 
+ 	dim as integer				_color 
+'
+'' FIXME: do z buffering
+ d_aflatcolor+=1
+   _color = d_aflatcolor
+'
+ do while (1)
+   
+ 	dim as 	integer	 lcount 
+ 	dim as 	ubyte	ptr lpdest 
+ 
+   	lcount = pspanpackage->count 
+ 
+ 		if (lcount = -1) then
+   		 return 
+ 		EndIf
+ 			
+ 
+ 		if (lcount) then
+ 			   		lpdest = pspanpackage->pdest 
+ 
+ 			do
+  		 
+ 				 *lpdest = _color: lpdest+=1 
+ 				
+ 				 lcount-=1
+ 			loop	 while (lcount) 
+ 			
+ 		EndIf
+ 
+ 		pspanpackage+=1
+ 	 loop
+end sub 
+
+
+
+sub R_RasterizeAliasPolySmooth () 
+ 	dim as integer				initialleftheight, initialrightheight 
+ 	dim as integer		ptr		plefttop,  prighttop,  pleftbottom,  prightbottom 
+ 	dim as integer				working_lstepx, originalcount 
+ 
+ 	plefttop = pedgetable->pleftedgevert0 
+ 	prighttop = pedgetable->prightedgevert0 
+ 
+	pleftbottom = pedgetable->pleftedgevert1 
+	prightbottom = pedgetable->prightedgevert1 
+
+	initialleftheight = pleftbottom[1] - plefttop[1] 
+	initialrightheight = prightbottom[1] - prighttop[1] 
+ 
+ 
+'// set the s, t, and light gradients, which are consistent across the triangle
+'// because being a triangle, things are affine
+'//
+ 	R_PolysetCalcGradients (r_affinetridesc.skinwidth) 
+'//
+'// rasterize the polygon
+'//
+ 
+'//
+'// scan out the top (and possibly only) part of the left edge
+'//
+ 	d_pedgespanpackage = a_spans 
+ 
+ 	ystart = plefttop[1] 
+ 	d_aspancount = plefttop[0] - prighttop[0] 
+ 
+ 	d_ptex = cast(ubyte ptr,r_affinetridesc.pskin) + (plefttop[2] shr 16) + _
+ 			(plefttop[3] shr 16) * r_affinetridesc.skinwidth 
+ '  //#if	id386ALIAS
+ '#if id386
+ 	if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 		d_sfrac = (plefttop[2] and &HFFFF) shl 16 
+ 		d_tfrac = (plefttop[3] and &HFFFF) shl 16 
+ 
+   '//#else
+ 	else
+ '#endif
+ 
+ 		d_sfrac = plefttop[2] and &HFFFF 
+ 		d_tfrac = plefttop[3] and &HFFFF 
+ 	end if
+'//#endif
+ 	d_light = plefttop[4] 
+ 	d_zi = plefttop[5] 
+ 
+ 	d_pdest = cast(ubyte ptr ,d_viewbuffer) + _
+ 			ystart * r_screenwidth + plefttop[0] 
+ 	d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0] 
+ 
+ 	if (initialleftheight = 1) then
+ 
+		d_pedgespanpackage->pdest = d_pdest 
+		d_pedgespanpackage->pz = d_pz 
+		d_pedgespanpackage->count = d_aspancount 
+		d_pedgespanpackage->ptex = d_ptex 
+
+		d_pedgespanpackage->sfrac = d_sfrac 
+		d_pedgespanpackage->tfrac = d_tfrac 
+
+'	// FIXME: need to clamp l, s, t, at both ends?
+		d_pedgespanpackage->light = d_light 
+		d_pedgespanpackage->zi = d_zi 
+
+ 		d_pedgespanpackage+=1
+ 
+ 	else
+ 
+ 		R_PolysetSetUpForLineScan(plefttop[0], plefttop[1], _
+ 							  pleftbottom[0], pleftbottom[1]) 
+   end if
+    '//#if	id386ALIAS
+' #if id386
+ 		if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 			d_pzbasestep = (d_zwidth + ubasestep) shl 1 
+ 			d_pzextrastep = d_pzbasestep + 2 
+ 	 
+'//#else
+ 		else
+ '#endif
+ 
+ 			d_pzbasestep = d_zwidth + ubasestep 
+ 			d_pzextrastep = d_pzbasestep + 1 
+ 		end if
+'//#endif
+ 
+ 		d_pdestbasestep = r_screenwidth + ubasestep 
+ 		d_pdestextrastep = d_pdestbasestep + 1 
+ 
+'	// TODO: can reuse partial expressions here
+ 
+'	// for negative steps in x along left edge, bias toward overflow rather than
+'	// underflow (sort of turning the floor () we did in the gradient calcs into
+'	// ceil (), but plus a little bit)
+ 		if (ubasestep < 0) then
+ 			working_lstepx = r_lstepx - 1 
+ 		else
+ 			working_lstepx = r_lstepx 
+ 		end if
+ 
+ 		d_countextrastep = ubasestep + 1 
+ 		d_ptexbasestep = ((r_sstepy + r_sstepx * ubasestep) shr 16) + _
+ 				((r_tstepy + r_tstepx * ubasestep) shr 16) * _
+ 				r_affinetridesc.skinwidth 
+'//#if	id386ALIAS
+ '#if id386
+ 		 if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 			d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) shl 16 
+ 			d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) shl 16 
+ 
+   	else
+'#endif
+ 
+'//#else
+ 			d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) and &HFFFF 
+ 			d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) and &HFFFF 
+ 		end if
+'//#endif
+ 		d_lightbasestep = r_lstepy + working_lstepx * ubasestep 
+ 		d_zibasestep = r_zistepy + r_zistepx * ubasestep 
+ 
+ 		d_ptexextrastep = ((r_sstepy + r_sstepx * d_countextrastep) shr 16) + _
+ 				((r_tstepy + r_tstepx * d_countextrastep) shr 16) * _
+ 				r_affinetridesc.skinwidth 
+'//#if	id386ALIAS
+'#if id386
+ 		if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 		 
+ 			d_sfracextrastep = (r_sstepy + r_sstepx*d_countextrastep) shl 16 
+ 			d_tfracextrastep = (r_tstepy + r_tstepx*d_countextrastep) shl 16  
+ 
+ 		else
+'#endif
+ 
+'//#else
+ 			d_sfracextrastep = (r_sstepy + r_sstepx*d_countextrastep) and &HFFFF 
+ 			d_tfracextrastep = (r_tstepy + r_tstepx*d_countextrastep) and &HFFFF 
+ 
+'//#endif
+ 		d_lightextrastep = d_lightbasestep + working_lstepx 
+ 		d_ziextrastep = d_zibasestep + r_zistepx 
+ 
+'#if id386
+ 		if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+   		R_PolysetScanLeftEdge (initialleftheight) 
+ 
+ 		else
+'#endif
+ 
+ 			R_PolysetScanLeftEdge_C(initialleftheight) 
+ 		end if
+	end if
+
+'//
+'// scan out the bottom part of the left edge, if it exists
+'//
+ 	 'if (pedgetable->numleftedges = 2) then
+ 
+ 		dim as integer		_height 
+ 
+ 		plefttop = pleftbottom 
+ 		pleftbottom = pedgetable->pleftedgevert2 
+ 
+ 		_height = pleftbottom[1] - plefttop[1] 
+ 
+'// TODO: make this a function; modularize this function in general
+ 
+ 		ystart = plefttop[1] 
+ 		d_aspancount = plefttop[0] - prighttop[0] 
+ 		d_ptex = cast(ubyte ptr,r_affinetridesc.pskin) + (plefttop[2] shr 16) + _
+ 				(plefttop[3] shr 16) * r_affinetridesc.skinwidth 
+		d_sfrac = 0 
+		d_tfrac = 0 
+		d_light = plefttop[4] 
+		d_zi = plefttop[5] 
+ 
+ 		 d_pdest = cast(ubyte ptr,d_viewbuffer) + ystart * r_screenwidth + plefttop[0] 
+ 		d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0] 
+ 
+ 		if (_height = 1) then
+ 
+			d_pedgespanpackage->pdest = d_pdest 
+			d_pedgespanpackage->pz = d_pz 
+			d_pedgespanpackage->count = d_aspancount 
+			d_pedgespanpackage->ptex = d_ptex 
+
+			d_pedgespanpackage->sfrac = d_sfrac 
+			d_pedgespanpackage->tfrac = d_tfrac 
+ 
+'		// FIXME: need to clamp l, s, t, at both ends?
+ 			d_pedgespanpackage->light = d_light 
+ 			d_pedgespanpackage->zi = d_zi 
+ 
+ 			d_pedgespanpackage+=1
+ 
+ 		else
+ 
+ 			R_PolysetSetUpForLineScan(plefttop[0], plefttop[1], _
+ 								  pleftbottom[0], pleftbottom[1]) 
+ 
+   		d_pdestbasestep = r_screenwidth + ubasestep 
+ 			d_pdestextrastep = d_pdestbasestep + 1 
+ 
+'//#if	id386ALIAS
+'#if id386
+ 			if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 				d_pzbasestep = (d_zwidth + ubasestep) shl 1 
+ 				d_pzextrastep = d_pzbasestep + 2 
+ 			 
+'//#else
+   		else
+'#endif
+ 
+ 				d_pzbasestep = d_zwidth + ubasestep 
+ 				d_pzextrastep = d_pzbasestep + 1 
+         end if
+'//#endif
+ 
+ 			if (ubasestep < 0) then
+ 				working_lstepx = r_lstepx - 1 
+ 			else
+ 				working_lstepx = r_lstepx
+ 			end if
+ 
+ 			d_countextrastep = ubasestep + 1 
+ 			d_ptexbasestep = ((r_sstepy + r_sstepx * ubasestep) shr 16) + _
+ 					((r_tstepy + r_tstepx * ubasestep) shr 16) * _
+ 					r_affinetridesc.skinwidth 
+'//#if	id386ALIAS
+'#if id386
+ 			if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 				d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) shl 16 
+ 				d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) shl 16 
+ 		 
+'//#else
+ 			else
+'#endif
+ 
+ 				d_sfracbasestep = (r_sstepy + r_sstepx * ubasestep) and &HFFFF 
+ 				d_tfracbasestep = (r_tstepy + r_tstepx * ubasestep) and &HFFFF  
+ 			end if
+'//#endif
+ 			d_lightbasestep = r_lstepy + working_lstepx * ubasestep  
+ 			d_zibasestep = r_zistepy + r_zistepx * ubasestep 
+ 
+ 			d_ptexextrastep = ((r_sstepy + r_sstepx * d_countextrastep) shr 16) + _
+ 					((r_tstepy + r_tstepx * d_countextrastep) shr 16) * _
+ 					r_affinetridesc.skinwidth 
+'//#if	id386ALIAS
+'#if id386
+ 			if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then 
+ 			 
+ 				d_sfracextrastep = ((r_sstepy+r_sstepx*d_countextrastep) and &HFFFF) shl 16 
+ 				d_tfracextrastep = ((r_tstepy+r_tstepx*d_countextrastep) and &HFFFF) shl 16 
+ 			 
+ 			else
+'#endif
+'//#endif
+ 		 
+ 				d_sfracextrastep = (r_sstepy+r_sstepx*d_countextrastep) and &HFFFF 
+ 				d_tfracextrastep = (r_tstepy+r_tstepx*d_countextrastep) and &HFFFF 
+ 			end if
+'//#endif
+ 			d_lightextrastep = d_lightbasestep + working_lstepx 
+ 			d_ziextrastep = d_zibasestep + r_zistepx 
+ 
+'#if id386
+ 			if ( d_pdrawspans = @R_PolysetDrawSpans8_Opaque() ) then
+ 
+ 				R_PolysetScanLeftEdge (_height) 
+ 
+ 			else
+'#endif
+ 
+ 				R_PolysetScanLeftEdge_C(_height) 
+ 			end if
+ 		end if
+ 
+'
+'// scan out the top (and possibly only) part of the right edge, updating the
+'// count field
+ 	d_pedgespanpackage = a_spans 
+
+	R_PolysetSetUpForLineScan(prighttop[0], prighttop[1], _
+						  prightbottom[0], prightbottom[1])
+ 	d_aspancount = 0 
+ 	d_countextrastep = ubasestep + 1 
+ 	originalcount = a_spans[initialrightheight].count 
+ 	a_spans[initialrightheight].count = -999999  '// mark end of the spanpackages
+   d_pdrawspans(a_spans) 
+'
+'// scan out the bottom part of the right edge, if it exists
+ 	if (pedgetable->numrightedges = 2) then
+ 
+ 		dim as integer				_height 
+ 		dim as spanpackage_t	ptr pstart 
+ 
+ 		pstart = a_spans + initialrightheight 
+ 		pstart->count = originalcount 
+ 
+ 		d_aspancount = prightbottom[0] - prighttop[0] 
+ 
+ 		prighttop = prightbottom 
+ 		prightbottom = pedgetable->prightedgevert2 
+ 
+ 		_height = prightbottom[1] - prighttop[1] 
+ 
+ 		R_PolysetSetUpForLineScan(prighttop[0], prighttop[1], _
+ 							  prightbottom[0], prightbottom[1]) 
+ 
+ 		d_countextrastep = ubasestep + 1 
+ 		a_spans[initialrightheight + _height].count = -999999 
+'											// mark end of the spanpackages
+ 		d_pdrawspans(pstart)
+ 	end if
+ 
+	
+End Sub
+
+
+'/*
+'================
+'R_PolysetSetEdgeTable
+'================
+'*/
+sub R_PolysetSetEdgeTable ()
+ 
+	dim as integer			edgetableindex 
+
+	edgetableindex = 0 	'// assume the vertices are already in
+						'//  top to bottom order
+
+'//
+'// determine which edges are right & left, and the order in which
+'// to rasterize them
+'//
+	if (r_p0(1) >= r_p1(1)) then
+	 if (r_p0(1) = r_p1(1)) then
+ 
+	 		if (r_p0(1) < r_p2(1)) then
+		   	pedgetable = @edgetables(2) 
+		 	else
+		   	pedgetable = @edgetables(5) 
+			end if
+		 	return 
+		 
+		 else
+		 
+	 	edgetableindex = 1 
+ 
+		EndIf
+	EndIf
+ 
+
+
+	if (r_p0(1) = r_p2(1)) then
+		
+			if (edgetableindex) then
+			pedgetable = @edgetables(8)
+		else
+			pedgetable = @edgetables(9)
+
+		return 
+		
+	EndIf
+	 
+ 
+	elseif (r_p1(1) = r_p2(1)) then
+ 
+		if (edgetableindex) then
+			pedgetable = @edgetables(10) 
+		else
+			pedgetable = @edgetables(11) 
+		end if
+		return 
+	end if
+
+	 if (r_p0(1) > r_p2(1)) then
+	 	edgetableindex += 2
+	 EndIf
+	 	 
+
+	 if (r_p1(1) > r_p2(1)) then
+	 	edgetableindex += 4 
+	 EndIf
+	 	
+
+	pedgetable = @edgetables(edgetableindex) 
+end sub

@@ -1080,7 +1080,7 @@ extern as mvertex_t	r_rightenter, r_rightexit
  
 end extern
 
-
+extern	as integer	r_aliasblendcolor
 
 
 
